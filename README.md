@@ -29,7 +29,7 @@
   </a>
 
 <h3 align="center">MyCBot</h3>
-
+</div>
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -59,18 +59,17 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-<div align="left">
 MyCBot создан для пользователей, которым требуется отправлять криптовалюту и работать с множеством кошельком.
 Поддерживается отправка токенов в 3 режимах:
-  <p>- 1 > many;</p>
-  <p>- many > many;</p>
-  <p>- many > 1;</p>
+  - 1 > many;
+  - many > many;
+  - many > 1;
 
 Так же с помощью бота возможно проверять баланс сразу большого количества кошельков.
-</div>
 ### Built With
 
 * [![Python][Python]][python-url]
+  
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
