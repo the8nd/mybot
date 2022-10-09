@@ -68,7 +68,7 @@ MyCBot создан для пользователей, которым требу
 Так же с помощью бота возможно проверять баланс сразу большого количества кошельков.
 ### Built With
 
-* [![Python][Python]][python-url]
+[![Python][Python]][python-url]
   
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
