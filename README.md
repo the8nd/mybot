@@ -112,7 +112,7 @@ To get a local copy up and running follow these simple example steps.
 
 - [ ] Фикс багов
 - [ ] Запуск открытого теста бота
-- [ ] Добавление базы даннх
+- [ ] Добавление базы данных
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
