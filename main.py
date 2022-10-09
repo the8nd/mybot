@@ -29,14 +29,17 @@ check_keyboard.add(button_balance_check, button_currency_check, button_token_sen
 
 #Клавиатура чекера балансов и сендера
 button_balance_bsc, button_balance_arb, button_balance_eth, button_balance_pol, button_cancel = KeyboardButton('BSC'), KeyboardButton('ARB'), KeyboardButton('ETH'),KeyboardButton('POL'), KeyboardButton('/cancel')
+button_balance_test = KeyboardButton('test') # Удалить или скрыть после тестов
 balance_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 balance_keyboard.add(button_balance_bsc, button_balance_arb)
 balance_keyboard.add(button_balance_eth, button_balance_pol)
+balance_keyboard.add(button_balance_test) # Удалить или скрыть после тестов
 balance_keyboard.add(button_cancel)
 cancel_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 cancel_keyboard.add(button_cancel)
 sender_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 sender_keyboard.add(button_balance_bsc, button_balance_eth)
+sender_keyboard.add(button_balance_test) # Удалить или скрыть после тестов
 sender_keyboard.add(button_cancel)
 
 
@@ -128,6 +131,9 @@ async def sender_netwok_choice(msg: types.Message, state: FSMContext):
     elif data['network'] == 'bsc':
         await ClientStatesGroup.sender_token_choice.set()
         await bot.send_message(msg.from_user.id, 'Для отправки транзакции на вашем кошельке должно быть минимум 0.08$ в BNB.\nОдна транзакция сжигает примерно 0.03$ в BNB.\nВведите название токена для отправки: "BNB", "USDT", "BUSD"', reply_markup=cancel_keyboard)
+    elif data['network'] == 'test': # Удалить или скрыть после тестов
+        await ClientStatesGroup.sender_token_choice.set()
+        await bot.send_message(msg.from_user.id, 'Для отправки транзакции на вашем кошельке должно быть минимум 0.08$ в BNB.\nОдна транзакция сжигает примерно 0.03$ в BNB.\nВведите название токена для отправки: "BNB", "USDT", "BUSD"',reply_markup=cancel_keyboard)
     else:
         await ClientStatesGroup.sender_network_choice.set()
         await bot.send_message(msg.from_user.id, 'Введенная вами сеть не поддерживается. Попытайтесь ввести название снова.')
@@ -257,6 +263,14 @@ async def addresses_checker(msg: types.Message, state: FSMContext):
         for i in range(len(balance_info_1)):
             await bot.send_message(msg.from_user.id, balance_info_1[i])
         await bot.send_message(msg.from_user.id, 'Все кошельки проверены', reply_markup=check_keyboard)
+        await state.finish()
+    elif data['network'] == 'test':
+        await bot.send_message(msg.from_user.id, 'Проверяю баланс')
+        balance_info = asyncio.create_task(test_cheker(data['adds']))
+        balance_info_1 = await balance_info
+        for i in range(len(balance_info_1)):
+            await bot.send_message(msg.from_user.id, balance_info_1[i])
+        await bot.send_message(msg.from_user.id, 'Все кошельки проверены.', reply_markup=check_keyboard)
         await state.finish()
     else:
         await msg.answer('Допущена ошибка при вводе. Попробуйте ввести сеть еще раз.')

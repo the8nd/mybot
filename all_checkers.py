@@ -105,3 +105,22 @@ async def pol_checker(addresses: list):
         except Exception:
             pol_result.append(f"{address} - адрес некорректен")
     return pol_result
+
+
+# Удалить или скрыть после тестов
+async def test_cheker(addresses: list):
+    address = ''
+    web3 = Web3(Web3.HTTPProvider(test_link))
+    addresses = addresses.split('\n')
+    test_result = []
+    for i in range(len(addresses)):
+        try:
+            address = web3.toChecksumAddress(addresses[i])
+            balance = web3.eth.get_balance(address)
+            balance = web3.fromWei(balance, 'ether')
+            test_result.append(f"{address}\n{round(balance, 3)} BNB")
+            print('add adds')
+        except Exception:
+            test_result.append(f"{address} - адрес некорректен")
+
+    return test_result

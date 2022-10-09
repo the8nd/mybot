@@ -95,6 +95,15 @@ async def token_sender(all_info):
             return hash_result
 
 
+    # Удалить или скрыть после тестов
+    elif all_info['network'] == 'test':
+        web3 = Web3(Web3.HTTPProvider(test_link))
+        gas = 100000
+        gwei = 20
+        chain_id = 97
+        token_name = 'BNB'
+
+
     if native_token == True:
         sender_add = ''
         for i in range(o):
@@ -111,9 +120,9 @@ async def token_sender(all_info):
                 }
                 sign_tx = web3.eth.account.signTransaction(token_tx, sender_private[sender_counter])
                 tx_hash = web3.eth.sendRawTransaction(sign_tx.rawTransaction)
-                tx_link = hlink('Ссылка', f'https://bscscan.com/tx/{web3.toHex(tx_hash)}')
+                #tx_link = hlink('Ссылка', f'https://bscscan.com/tx/{web3.toHex(tx_hash)}') # Потом вернуть на место и сделать для эфира
                 hash_result.append(
-                    f'<b>{counter}</b>\n<b>Хэш:</b> {tx_link}\n<b>Отправлено:</b> {amount_to_send} BNB\n<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
+                    f'<b>{counter}</b>\n<b>Хэш:</b> {tx_hash}\n<b>Отправлено:</b> {amount_to_send} BNB\n<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
                 time.sleep(time_hold)
             except ValueError:
                 hash_result.append(

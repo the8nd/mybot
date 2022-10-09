@@ -8,7 +8,7 @@ arb_link = 'https://arb-mainnet.g.alchemy.com/v2/fwpdYGooLzR3jw8a6YK5HMRbswJWWQm
 bsc_link = 'https://bsc-dataseed.binance.org/' # chain id 56
 polygon_link = 'https://polygon-mainnet.g.alchemy.com/v2/bNT1IhanZMXGDeq1WswvDHS2Vl3kHd4c' # chain id 137
 ethereum_link = 'https://eth-mainnet.g.alchemy.com/v2/TJ_tNX6LRTX7ZAemte6N7LpbR2zWC4VS' # chain id 1
-
+test_link = 'https://data-seed-prebsc-1-s3.binance.org:8545'
 
 # Контракты/ABI
 # Arbitrum
