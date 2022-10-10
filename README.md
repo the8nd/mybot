@@ -126,7 +126,7 @@ Distributed under the MIT License.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@the89d](https://twitter.com/the89d
+[@the89d](https://twitter.com/the89d
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
