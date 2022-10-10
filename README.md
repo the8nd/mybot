@@ -25,7 +25,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/the8nd/mybot">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="![bot_image](https://user-images.githubusercontent.com/58310208/194867607-90470fc2-8903-4ef2-b48b-1a7c03375ac8.png)" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">MyCBot</h3>
