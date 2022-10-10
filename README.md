@@ -25,7 +25,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/the8nd/mybot">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="https://user-images.githubusercontent.com/58310208/194868083-8bdce1e1-9d6f-491a-b906-005ec45e0d2b.png" width="80" height="80">
   </a>
 
 <h3 align="center">MyCBot</h3>
@@ -126,7 +126,7 @@ Distributed under the MIT License.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@the89d](https://twitter.com/the89d
+[@the89d](https://twitter.com/the89d)
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
