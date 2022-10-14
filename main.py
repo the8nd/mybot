@@ -20,7 +20,8 @@ storage = MemoryStorage()
 bot = Bot(token=token)
 dp = Dispatcher(bot=bot, storage=storage)
 
-logging.basicConfig(filename='bot.log', encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(filename='bot_info.log', encoding='utf-8', level=logging.INFO)
+logging.basicConfig(filename='bot_debug.log', encoding='utf-8', level=logging.DEBUG)
 
 
 # Машина состояний.
@@ -28,15 +29,15 @@ class ClientStatesGroup(StatesGroup):
     network_scan = State()
     balance_scan = State()
 
-    sender_network_choice = State() # Выбор сети для отправки
-    sender_token_choice = State() # Выбор токена для отправки
-    sender_address = State() # Адреса отправителей
-    sender_private = State() # Приватные ключи кошельков
-    amount_of_token = State() # Количество токенов
-    reciever_addresses = State() # Получаем адреса получателей токенов
+    sender_network_choice = State()  # Выбор сети для отправки
+    sender_token_choice = State()  # Выбор токена для отправки
+    sender_address = State()  # Адреса отправителей
+    sender_private = State()  # Приватные ключи кошельков
+    amount_of_token = State()  # Количество токенов
+    reciever_addresses = State()  # Получаем адреса получателей токенов
 
-    amount_of_gwei = State() # Для сети эфира. Пользователь указывает кол-во gwei
-    amount_of_gas = State() # Для сети эфира. Пользователь указывает лимит газа
+    amount_of_gwei = State()  # Для сети эфира. Пользователь указывает кол-во gwei
+    amount_of_gas = State()  # Для сети эфира. Пользователь указывает лимит газа
 
 
 # Получаем цену токена с бинанса
@@ -77,8 +78,7 @@ async def start_command(msg: types.Message):
                     f"1. Проверить баланс кошелька\n"
                     f"2. Узнать текущую стоимость валюты\n "
                     f"(Данные о курсах берутся с Binance)\n"
-                    f"3. Отправить токен",
-                        reply_markup=check_keyboard)
+                    f"3. Отправить токен", reply_markup=check_keyboard)
 
 
 # Сбрасывает машину состояний. Возможен выход из любого состояния.
@@ -108,16 +108,25 @@ async def sender_netwok_choice(msg: types.Message, state: FSMContext):
     if data['network'] == 'eth':
         await ClientStatesGroup.amount_of_gwei.set()
         gas = await gas_price()
-        await bot.send_message(msg.from_user.id, f'Введите кол-во GWEI.\nТекущее кол-во GWEI в сети: <b><code>{gas}</code></b>', parse_mode='HTML', reply_markup=cancel_keyboard)
+        await bot.send_message(msg.from_user.id, f'Введите кол-во GWEI.\nТекущее кол-во GWEI в сети: '
+                                                 f'<b><code>{gas}</code></b>',
+                               parse_mode='HTML', reply_markup=cancel_keyboard)
     elif data['network'] == 'bsc':
         await ClientStatesGroup.sender_token_choice.set()
-        await bot.send_message(msg.from_user.id, 'Для отправки транзакции на вашем кошельке должно быть минимум 0.08$ в BNB.\nОдна транзакция сжигает примерно 0.03$ в BNB.\nВведите название токена для отправки: "BNB", "USDT", "BUSD"', reply_markup=cancel_keyboard)
-    elif data['network'] == 'test': # Удалить или скрыть после тестов
+        await bot.send_message(msg.from_user.id, 'Для отправки транзакции на вашем кошельке должно быть минимум '
+                                                 '0.08$ в BNB.\nОдна транзакция сжигает примерно 0.03$ в BNB.\n'
+                                                 'Введите название токена для отправки: "BNB", "USDT", "BUSD"',
+                               reply_markup=cancel_keyboard)
+    elif data['network'] == 'test':  # Удалить или скрыть после тестов
         await ClientStatesGroup.sender_token_choice.set()
-        await bot.send_message(msg.from_user.id, 'Для отправки транзакции на вашем кошельке должно быть минимум 0.08$ в BNB.\nОдна транзакция сжигает примерно 0.03$ в BNB.\nВведите название токена для отправки: "BNB", "USDT", "BUSD"',reply_markup=cancel_keyboard)
+        await bot.send_message(msg.from_user.id, 'Для отправки транзакции на вашем кошельке должно быть минимум'
+                                                 ' 0.08$ в BNB.\nОдна транзакция сжигает примерно 0.03$ в BNB.\n'
+                                                 'Введите название токена для отправки: "BNB", "USDT", "BUSD"',
+                               reply_markup=cancel_keyboard)
     else:
         await ClientStatesGroup.sender_network_choice.set()
-        await bot.send_message(msg.from_user.id, 'Введенная вами сеть не поддерживается. Попытайтесь ввести название снова.')
+        await bot.send_message(msg.from_user.id, 'Введенная вами сеть не поддерживается. '
+                                                 'Попытайтесь ввести название снова.')
 
 
 @dp.message_handler(state=ClientStatesGroup.amount_of_gwei)
@@ -125,7 +134,9 @@ async def sender_gwei(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['gwei'] = msg.text.lower()
     await ClientStatesGroup.amount_of_gas.set()
-    await bot.send_message(msg.from_user.id, 'Введите количество газа для транзакции. Лишний газ не сгорит. Вводите с запасом. <b>Администрация за фейл транзакции ответственности не несет.</b>', parse_mode='html')
+    await bot.send_message(msg.from_user.id, 'Введите количество газа для транзакции. Лишний газ не сгорит. '
+                                             'Вводите с запасом. <b>Администрация за фейл транзакции '
+                                             'ответственности не несет.</b>', parse_mode='html')
 
 
 @dp.message_handler(state=ClientStatesGroup.amount_of_gas)
@@ -138,7 +149,8 @@ async def sender_gas(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(state=ClientStatesGroup.sender_token_choice)
 async def sender_token_choice(msg: types.Message, state: FSMContext):
-    if msg.text.lower() == 'bnb' or msg.text.lower() == 'usdt' or msg.text.lower() == 'busd' or msg.text.lower() == 'eth':
+    if msg.text.lower() == 'bnb' or msg.text.lower() == 'usdt' or \
+            msg.text.lower() == 'busd' or msg.text.lower() == 'eth':
         async with state.proxy() as data:
             data['token'] = msg.text.lower()
         await ClientStatesGroup.sender_address.set()
@@ -165,7 +177,7 @@ async def sender_private(msg: types.Message, state: FSMContext):
 
 
 @dp.message_handler(state=ClientStatesGroup.amount_of_token)
-async def amount_of_token(msg: types.Message, state:FSMContext):
+async def amount_of_token(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         amount = msg.text
         data['amount'] = amount.replace(',', '.')
@@ -258,11 +270,11 @@ async def addresses_checker(msg: types.Message, state: FSMContext):
         await ClientStatesGroup.network_scan.set()
 
 
-# Пока не реализованная функция. Нужно сделать красивое оформление и if для свапа валют местами, если кидает ошибку -1121.
+# Пока не реализованная функция. Нужно сделать красивое оформление и if для свапа валют местами, если кидает ошибку.
 @dp.message_handler()
 async def price_checker(msg: types.message):
     pass
-    #await bot.send_message(msg.from_user.id, 'Временно отсутствует')
+    # await bot.send_message(msg.from_user.id, 'Временно отсутствует')
 
 
 if __name__ == '__main__':
