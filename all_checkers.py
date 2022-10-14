@@ -55,7 +55,6 @@ async def bsc_cheker(addresses: list):
             balance_twt_in_busd = float(balance_twt) * float(price_dollar_twt['price'])
             balance_cake_in_busd = float(balance_cake) * float(price_dollar_cake['price'])
             bsc_result.append(f"{address}\n{'%.3f' % balance}BNB ~ {'%.2f' % balance_bnb_in_busd}$\n{'%2.f' % balance_busd} BUSD\n{balance_usdt} USDT\n{'%2.f' % balance_twt} TWT ~ {'%.2f' % balance_twt_in_busd}\n{'%2.f' % balance_cake} Cake ~ {'%.2f' % balance_cake_in_busd}")
-            print('add adds')
         except Exception:
             bsc_result.append(f"{address} - адрес некорректен")
 
