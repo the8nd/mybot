@@ -223,51 +223,27 @@ async def addresses_checker(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['adds'] = msg.text
 
-        # Вызов функции чекера arb
     if data['network'] == 'arb':
-        await bot.send_message(msg.from_user.id, 'Проверяю баланс')
-        balance_info = asyncio.create_task(arb_checker(data['adds']))
-        balance_info_1 = await balance_info
-        for i, info_msg in enumerate(balance_info_1):
-            await bot.send_message(msg.from_user.id, info_msg)
-        await bot.send_message(msg.from_user.id, 'Все кошельки проверены.', reply_markup=check_keyboard)
-        await state.finish()
-        # Вызов функции чекера bsc
+        checker_choice = arb_checker
     elif data['network'] == 'bsc':
-        await bot.send_message(msg.from_user.id, 'Проверяю баланс')
-        balance_info = asyncio.create_task(bsc_cheker(data['adds']))
-        balance_info_1 = await balance_info
-        for i, info_msg in enumerate(balance_info_1):
-            await bot.send_message(msg.from_user.id, info_msg)
-        await bot.send_message(msg.from_user.id, 'Все кошельки проверены.', reply_markup=check_keyboard)
-        await state.finish()
+        checker_choice = bsc_checker
     elif data['network'] == 'eth':
-        await bot.send_message(msg.from_user.id, 'Проверяю баланс')
-        balance_info = asyncio.create_task(eth_checker(data['adds']))
-        balance_info_1 = await balance_info
-        for i, info_msg in enumerate(balance_info_1):
-            await bot.send_message(msg.from_user.id, info_msg)
-        await bot.send_message(msg.from_user.id, 'Все кошельки проверены.', reply_markup=check_keyboard)
-        await state.finish()
+        checker_choice = eth_checker
     elif data['network'] == 'pol':
-        await bot.send_message(msg.from_user.id, 'Проверяю баланс')
-        balance_info = asyncio.create_task(pol_checker(data['adds']))
-        balance_info_1 = await balance_info
-        for i, info_msg in enumerate(balance_info_1):
-            await bot.send_message(msg.from_user.id, info_msg)
-        await bot.send_message(msg.from_user.id, 'Все кошельки проверены', reply_markup=check_keyboard)
-        await state.finish()
+        checker_choice = pol_checker
     elif data['network'] == 'test':
-        await bot.send_message(msg.from_user.id, 'Проверяю баланс')
-        balance_info = asyncio.create_task(test_cheker(data['adds']))
-        balance_info_1 = await balance_info
-        for i, info_msg in enumerate(balance_info_1):
-            await bot.send_message(msg.from_user.id, info_msg)
-        await bot.send_message(msg.from_user.id, 'Все кошельки проверены.', reply_markup=check_keyboard)
-        await state.finish()
+        checker_choice = test_checker
     else:
         await msg.answer('Допущена ошибка при вводе. Попробуйте ввести сеть еще раз.')
         await ClientStatesGroup.network_scan.set()
+
+    await bot.send_message(msg.from_user.id, 'Проверяю баланс')
+    balance_info = asyncio.create_task(checker_choice(data['adds']))
+    balance_info_1 = await balance_info
+    for i, info_msg in enumerate(balance_info_1):
+        await bot.send_message(msg.from_user.id, info_msg)
+    await bot.send_message(msg.from_user.id, 'Все кошельки проверены.', reply_markup=check_keyboard)
+    await state.finish()
 
 
 # Пока не реализованная функция. Нужно сделать красивое оформление и if для свапа валют местами, если кидает ошибку.

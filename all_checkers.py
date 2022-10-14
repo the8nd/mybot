@@ -26,7 +26,7 @@ async def arb_checker(addresses: list):
 
 
 # Функция отвечает за проверку баланса в сети смартчейн
-async def bsc_cheker(addresses: list):
+async def bsc_checker(addresses: list):
     web3 = Web3(Web3.HTTPProvider(bsc_link))
     addresses = addresses.split('\n')
     contract_busd = web3.eth.contract(address=busd_bsc, abi=busd_bsc_abi)
@@ -104,7 +104,7 @@ async def pol_checker(addresses: list):
 
 
 # Удалить или скрыть после тестов
-async def test_cheker(addresses: list):
+async def test_checker(addresses: list):
     web3 = Web3(Web3.HTTPProvider(test_link))
     addresses = addresses.split('\n')
     test_result = []
