@@ -21,7 +21,6 @@ bot = Bot(token=token)
 dp = Dispatcher(bot=bot, storage=storage)
 
 logging.basicConfig(filename='bot_info.log', encoding='utf-8', level=logging.INFO)
-logging.basicConfig(filename='bot_debug.log', encoding='utf-8', level=logging.DEBUG)
 
 
 # Машина состояний.
