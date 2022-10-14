@@ -19,7 +19,8 @@ async def arb_checker(addresses: list):
             balance_arb_usdt = contract_usdt_arb.functions.balanceOf(address).call()
             balance_arb_usdt = web3.fromWei(balance_arb_usdt, 'ether')
             balance_eth_in_busd = float(balance) * float(price_dollar['price'])
-            arb_result.append(f"{address}\n{'%.3f' % balance} ETH ~ {'%.2f' % balance_eth_in_busd}$\n{'%2.f' % balance_arb_usdt} USDT")
+            arb_result.append(f"{address}\n{'%.3f' % balance} ETH ~ {'%.2f' % balance_eth_in_busd}$\n"
+                              f"{'%2.f' % balance_arb_usdt} USDT")
         except Exception:
             arb_result.append(f"{address} - адрес некорректен")
     return arb_result
@@ -53,7 +54,10 @@ async def bsc_checker(addresses: list):
             balance_bnb_in_busd = float(balance) * float(price_dollar_bnb['price'])
             balance_twt_in_busd = float(balance_twt) * float(price_dollar_twt['price'])
             balance_cake_in_busd = float(balance_cake) * float(price_dollar_cake['price'])
-            bsc_result.append(f"{address}\n{'%.3f' % balance} BNB ~ {'%.2f' % balance_bnb_in_busd}$\n{'%2.f' % balance_busd} BUSD\n{balance_usdt} USDT\n{'%2.f' % balance_twt} TWT ~ {'%.2f' % balance_twt_in_busd}\n{'%2.f' % balance_cake} Cake ~ {'%.2f' % balance_cake_in_busd}")
+            bsc_result.append(f"{address}\n{'%.3f' % balance} BNB ~ {'%.2f' % balance_bnb_in_busd}$\n"
+                              f"{'%2.f' % balance_busd} BUSD\n{balance_usdt} USDT\n{'%2.f' % balance_twt} TWT ~ "
+                              f"{'%.2f' % balance_twt_in_busd}\n{'%2.f' % balance_cake} Cake ~ "
+                              f"{'%.2f' % balance_cake_in_busd}")
         except Exception:
             bsc_result.append(f"{address} - адрес некорректен")
 
@@ -74,7 +78,8 @@ async def eth_checker(addresses: list):
             balance_usdt = contract_usdt.functions.balanceOf(address).call()
             balance_usdt = web3.fromWei(balance_usdt, 'ether')
             balance_eth_in_usdt = float(balance) * float(price_dollar_eth['price'])
-            eth_result.append(f"{address}\n{round(balance, 3)} ETH ~ {round(balance_eth_in_usdt, 2)}$\n{round(balance_usdt, 2)} USDT")
+            eth_result.append(f"{address}\n{round(balance, 3)} ETH ~ {round(balance_eth_in_usdt, 2)}$"
+                              f"\n{round(balance_usdt, 2)} USDT")
 
         except Exception:
             eth_result.append(f"{address} - адрес некорректен")
@@ -97,7 +102,8 @@ async def pol_checker(addresses: list):
             balance_weth = web3.fromWei(balance_weth, 'ether')
             balance_weth_in_usdt = float(balance_weth) * float(price_dollar_weth['price'])
             balance_in_usdt = float(balance) * float(price_dollar_matic['price'])
-            pol_result.append(f"{address}\n{round(balance, 3)} MATIC ~ {round(balance_in_usdt, 2)}$\n{round(balance_weth, 3)} wETH ~ {round(balance_weth_in_usdt, 2)}$")
+            pol_result.append(f"{address}\n{round(balance, 3)} MATIC ~ {round(balance_in_usdt, 2)}$\n"
+                              f"{round(balance_weth, 3)} wETH ~ {round(balance_weth_in_usdt, 2)}$")
         except Exception:
             pol_result.append(f"{address} - адрес некорректен")
     return pol_result
