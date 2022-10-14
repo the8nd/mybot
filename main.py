@@ -49,10 +49,11 @@ async def get_price(currency1: str, currency2: str):
     return json.loads(price_data)
 
 
-async def gas_price():
-    web3 = Web3(Web3.HTTPProvider(ethereum_link))
-    gas = round(web3.fromWei(web3.eth.gas_price, 'gwei'), 0)
-    return gas
+async def gwei_price(net: str):
+    provider_link = net
+    web3 = Web3(Web3.HTTPProvider(provider_link))
+    gwei = round(web3.fromWei(web3.eth.gas_price, 'gwei'), 0)
+    return gwei
 
 
 async def wait_time(info):
@@ -106,16 +107,18 @@ async def sender_netwok_choice(msg: types.Message, state: FSMContext):
         data['network'] = msg.text.lower()
     if data['network'] == 'eth':
         await ClientStatesGroup.amount_of_gwei.set()
-        gas = await gas_price()
+        gwei = await gwei_price(ethereum_link)
         await bot.send_message(msg.from_user.id, f'Введите кол-во GWEI.\nТекущее кол-во GWEI в сети: '
-                                                 f'<b><code>{gas}</code></b>',
+                                                 f'<b><code>{gwei}</code></b>',
                                parse_mode='HTML', reply_markup=cancel_keyboard)
     elif data['network'] == 'bsc':
-        await ClientStatesGroup.sender_token_choice.set()
-        await bot.send_message(msg.from_user.id, 'Для отправки транзакции на вашем кошельке должно быть минимум '
-                                                 '0.08$ в BNB.\nОдна транзакция сжигает примерно 0.03$ в BNB.\n'
-                                                 'Введите название токена для отправки: "BNB", "USDT", "BUSD"',
-                               reply_markup=cancel_keyboard)
+        await ClientStatesGroup.amount_of_gwei.set()
+        gwei = await gwei_price(bsc_link)
+        await bot.send_message(msg.from_user.id, f'Минимальный баланс $ в BNB для отправки транзакции:\n'
+                                                 'Для BNB: 0.03$ (5 GWEI, 21000 GAS)\n'
+                                                 'Для BUSD/USDT: 0.08$ (5 GWEI, 75000 GAS)\n'
+                                                 f'Текущее значение GWEI - <b><code>{gwei}</code></b>\n',
+                               parse_mode='HTML', reply_markup=cancel_keyboard)
     elif data['network'] == 'test':  # Удалить или скрыть после тестов
         await ClientStatesGroup.sender_token_choice.set()
         await bot.send_message(msg.from_user.id, 'Для отправки транзакции на вашем кошельке должно быть минимум'
@@ -142,8 +145,12 @@ async def sender_gwei(msg: types.Message, state: FSMContext):
 async def sender_gas(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['gas'] = msg.text.lower()
-    await ClientStatesGroup.sender_token_choice.set()
-    await bot.send_message(msg.from_user.id, 'Введите название токена для отправки: "ETH", "USDT"')
+    if data['network'] == 'eth':
+        await ClientStatesGroup.sender_token_choice.set()
+        await bot.send_message(msg.from_user.id, 'Введите название токена для отправки: \n"ETH", "USDT"')
+    elif data['network'] == 'bsc':
+        await ClientStatesGroup.sender_token_choice.set()
+        await bot.send_message(msg.from_user.id, 'Введите название токена для отправки: \n"BNB", "USDT", "BUSD"')
 
 
 @dp.message_handler(state=ClientStatesGroup.sender_token_choice)
