@@ -1,4 +1,4 @@
-import time
+import logging
 
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
@@ -6,9 +6,9 @@ from aiogram.utils import executor
 from bot_token import token
 from all_sender import *
 from all_checkers import *
+from keyboard_all import *
 import aiohttp
 import json
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.dispatcher import FSMContext
@@ -20,27 +20,7 @@ storage = MemoryStorage()
 bot = Bot(token=token)
 dp = Dispatcher(bot=bot, storage=storage)
 
-
-# Начальная клавиатура.
-button_balance_check, button_currency_check, button_token_sender = KeyboardButton('Баланс'), KeyboardButton('Узнать курс'), KeyboardButton('Отправить токен')
-check_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-check_keyboard.add(button_balance_check, button_currency_check, button_token_sender)
-
-
-#Клавиатура чекера балансов и сендера
-button_balance_bsc, button_balance_arb, button_balance_eth, button_balance_pol, button_cancel = KeyboardButton('BSC'), KeyboardButton('ARB'), KeyboardButton('ETH'),KeyboardButton('POL'), KeyboardButton('/cancel')
-button_balance_test = KeyboardButton('test') # Удалить или скрыть после тестов
-balance_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-balance_keyboard.add(button_balance_bsc, button_balance_arb)
-balance_keyboard.add(button_balance_eth, button_balance_pol)
-balance_keyboard.add(button_balance_test) # Удалить или скрыть после тестов
-balance_keyboard.add(button_cancel)
-cancel_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-cancel_keyboard.add(button_cancel)
-sender_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-sender_keyboard.add(button_balance_bsc, button_balance_eth)
-sender_keyboard.add(button_balance_test) # Удалить или скрыть после тестов
-sender_keyboard.add(button_cancel)
+logging.basicConfig(filename='bot.log', encoding='utf-8', level=logging.DEBUG)
 
 
 # Машина состояний.
@@ -65,7 +45,7 @@ async def get_price(currency1: str, currency2: str):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as responce:
             price_data = await responce.text()
-            print(price_data)
+            logging.info(price_data)
     return json.loads(price_data)
 
 
@@ -115,7 +95,8 @@ async def cancel_command(msg: types.Message, state: FSMContext):
 @dp.message_handler(Text(equals='Отправить токен', ignore_case=True), state=None)
 async def sender_start(msg: types.message):
     await ClientStatesGroup.sender_network_choice.set()
-    print(msg.from_user.username, msg.from_user.id)
+    logging.info(msg.from_user.username)
+    logging.info(msg.from_user.id)
     await msg.answer('Выберите сеть: BSC, ETH',
                      reply_markup=sender_keyboard)
 
@@ -200,9 +181,8 @@ async def reciever_addresses(msg: types.Message, state: FSMContext):
     await bot.send_message(msg.from_user.id, f'Начал работу. Примерное время ожидания - {delay_time} секунд.')
     sender_info = asyncio.create_task(token_sender(data))
     hashes = await sender_info
-    for i in range(len(hashes)):
-        await bot.send_message(msg.from_user.id, hashes[i], reply_markup=check_keyboard, parse_mode="HTML")
-    print(data)
+    for i, hash in enumerate(hashes):
+        await bot.send_message(msg.from_user.id, hash, reply_markup=check_keyboard, parse_mode="HTML")
     await state.finish()
 
 
@@ -210,7 +190,8 @@ async def reciever_addresses(msg: types.Message, state: FSMContext):
 @dp.message_handler(Text(equals='Баланс', ignore_case=True), state=None)
 async def balance_start(msg: types.Message):
     await ClientStatesGroup.network_scan.set()
-    print(msg.from_user.username, msg.from_user.id)
+    logging.info(msg.from_user.username)
+    logging.info(msg.from_user.id)
     await msg.answer('Выберите сеть: \nArbitrum (ARB)\nBinance Smart Chain (BSC)\nEthereum (ETH)\nPolygon (POL)',
                      reply_markup=balance_keyboard)
 
@@ -235,8 +216,8 @@ async def addresses_checker(msg: types.Message, state: FSMContext):
         await bot.send_message(msg.from_user.id, 'Проверяю баланс')
         balance_info = asyncio.create_task(arb_checker(data['adds']))
         balance_info_1 = await balance_info
-        for i in range(len(balance_info_1)):
-            await bot.send_message(msg.from_user.id, balance_info_1[i])
+        for i, info_msg in enumerate(balance_info_1):
+            await bot.send_message(msg.from_user.id, info_msg)
         await bot.send_message(msg.from_user.id, 'Все кошельки проверены.', reply_markup=check_keyboard)
         await state.finish()
         # Вызов функции чекера bsc
@@ -244,32 +225,32 @@ async def addresses_checker(msg: types.Message, state: FSMContext):
         await bot.send_message(msg.from_user.id, 'Проверяю баланс')
         balance_info = asyncio.create_task(bsc_cheker(data['adds']))
         balance_info_1 = await balance_info
-        for i in range(len(balance_info_1)):
-            await bot.send_message(msg.from_user.id, balance_info_1[i])
+        for i, info_msg in enumerate(balance_info_1):
+            await bot.send_message(msg.from_user.id, info_msg)
         await bot.send_message(msg.from_user.id, 'Все кошельки проверены.', reply_markup=check_keyboard)
         await state.finish()
     elif data['network'] == 'eth':
         await bot.send_message(msg.from_user.id, 'Проверяю баланс')
         balance_info = asyncio.create_task(eth_checker(data['adds']))
         balance_info_1 = await balance_info
-        for i in range(len(balance_info_1)):
-            await bot.send_message(msg.from_user.id, balance_info_1[i])
+        for i, info_msg in enumerate(balance_info_1):
+            await bot.send_message(msg.from_user.id, info_msg)
         await bot.send_message(msg.from_user.id, 'Все кошельки проверены.', reply_markup=check_keyboard)
         await state.finish()
     elif data['network'] == 'pol':
         await bot.send_message(msg.from_user.id, 'Проверяю баланс')
         balance_info = asyncio.create_task(pol_checker(data['adds']))
         balance_info_1 = await balance_info
-        for i in range(len(balance_info_1)):
-            await bot.send_message(msg.from_user.id, balance_info_1[i])
+        for i, info_msg in enumerate(balance_info_1):
+            await bot.send_message(msg.from_user.id, info_msg)
         await bot.send_message(msg.from_user.id, 'Все кошельки проверены', reply_markup=check_keyboard)
         await state.finish()
     elif data['network'] == 'test':
         await bot.send_message(msg.from_user.id, 'Проверяю баланс')
         balance_info = asyncio.create_task(test_cheker(data['adds']))
         balance_info_1 = await balance_info
-        for i in range(len(balance_info_1)):
-            await bot.send_message(msg.from_user.id, balance_info_1[i])
+        for i, info_msg in enumerate(balance_info_1):
+            await bot.send_message(msg.from_user.id, info_msg)
         await bot.send_message(msg.from_user.id, 'Все кошельки проверены.', reply_markup=check_keyboard)
         await state.finish()
     else:

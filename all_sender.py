@@ -105,8 +105,7 @@ async def token_sender(all_info):
 
 
     if native_token == True:
-        sender_add = ''
-        for i in range(o):
+        for i, sender_add in enumerate(o):
             try:
                 sender_add = web3.toChecksumAddress(sender_adds[sender_counter])  # Превращаем в checksum
                 reciever_add = web3.toChecksumAddress(reciever_adds[reciever_counter])
@@ -139,8 +138,7 @@ async def token_sender(all_info):
 
 
     elif native_token == False:
-        sender_add = ''
-        for i in range(o):
+        for i, sender_add in enumerate(o):
             try:
                 sender_add = web3.toChecksumAddress(sender_adds[sender_counter])
                 reciever_add = web3.toChecksumAddress(reciever_adds[reciever_counter])

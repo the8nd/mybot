@@ -11,9 +11,9 @@ async def arb_checker(addresses: list):
     contract_usdt_arb = web3.eth.contract(address=usdt_arb, abi=usdt_arb_abi)
     price_dollar = await get_price('ETH', 'BUSD')
     arb_result = []
-    for i in range(len(addresses)):
+    for i, address in enumerate(addresses):
         try:
-            address = web3.toChecksumAddress(addresses[i])
+            address = web3.toChecksumAddress(address)
             balance = web3.eth.get_balance(address)
             balance = web3.fromWei(balance, 'ether')
             balance_arb_usdt = contract_usdt_arb.functions.balanceOf(address).call()
@@ -27,7 +27,6 @@ async def arb_checker(addresses: list):
 
 # Функция отвечает за проверку баланса в сети смартчейн
 async def bsc_cheker(addresses: list):
-    address = ''
     web3 = Web3(Web3.HTTPProvider(bsc_link))
     addresses = addresses.split('\n')
     contract_busd = web3.eth.contract(address=busd_bsc, abi=busd_bsc_abi)
@@ -38,9 +37,9 @@ async def bsc_cheker(addresses: list):
     price_dollar_twt = await get_price('TWT', 'BUSD')
     price_dollar_cake = await get_price('CAKE', 'BUSD')
     bsc_result = []
-    for i in range(len(addresses)):
+    for i, address in enumerate(addresses):
         try:
-            address = web3.toChecksumAddress(addresses[i])
+            address = web3.toChecksumAddress(address)
             balance = web3.eth.get_balance(address)
             balance = web3.fromWei(balance, 'ether')
             balance_busd = contract_busd.functions.balanceOf(address).call()
@@ -54,7 +53,7 @@ async def bsc_cheker(addresses: list):
             balance_bnb_in_busd = float(balance) * float(price_dollar_bnb['price'])
             balance_twt_in_busd = float(balance_twt) * float(price_dollar_twt['price'])
             balance_cake_in_busd = float(balance_cake) * float(price_dollar_cake['price'])
-            bsc_result.append(f"{address}\n{'%.3f' % balance}BNB ~ {'%.2f' % balance_bnb_in_busd}$\n{'%2.f' % balance_busd} BUSD\n{balance_usdt} USDT\n{'%2.f' % balance_twt} TWT ~ {'%.2f' % balance_twt_in_busd}\n{'%2.f' % balance_cake} Cake ~ {'%.2f' % balance_cake_in_busd}")
+            bsc_result.append(f"{address}\n{'%.3f' % balance} BNB ~ {'%.2f' % balance_bnb_in_busd}$\n{'%2.f' % balance_busd} BUSD\n{balance_usdt} USDT\n{'%2.f' % balance_twt} TWT ~ {'%.2f' % balance_twt_in_busd}\n{'%2.f' % balance_cake} Cake ~ {'%.2f' % balance_cake_in_busd}")
         except Exception:
             bsc_result.append(f"{address} - адрес некорректен")
 
@@ -62,15 +61,14 @@ async def bsc_cheker(addresses: list):
 
 
 async def eth_checker(addresses: list):
-    address = ''
     web3 = Web3(Web3.HTTPProvider(ethereum_link))
     addresses = addresses.split('\n')
     contract_usdt = web3.eth.contract(address=usdt_eth, abi=usdt_eth_abi)
     price_dollar_eth = await get_price('ETH', 'USDT')
     eth_result = []
-    for i in range(len(addresses)):
+    for i, address in enumerate(addresses):
         try:
-            address = web3.toChecksumAddress(addresses[i])
+            address = web3.toChecksumAddress(address)
             balance = web3.eth.get_balance(address)
             balance = web3.fromWei(balance, 'ether')
             balance_usdt = contract_usdt.functions.balanceOf(address).call()
@@ -84,16 +82,15 @@ async def eth_checker(addresses: list):
 
 
 async def pol_checker(addresses: list):
-    address = ''
     web3 = Web3(Web3.HTTPProvider(polygon_link))
     addresses = addresses.split('\n')
     contract_weth = web3.eth.contract(address=weth_pol, abi=weth_pol_abi)
     price_dollar_weth = await get_price('ETH', 'USDT')
     price_dollar_matic = await get_price('MATIC', 'USDT')
     pol_result = []
-    for i in range(len(addresses)):
+    for i, address in enumerate(addresses):
         try:
-            address = web3.toChecksumAddress(addresses[i])
+            address = web3.toChecksumAddress(address)
             balance = web3.eth.get_balance(address)
             balance = web3.fromWei(balance, 'ether')
             balance_weth = contract_weth.functions.balanceOf(address).call()
@@ -108,17 +105,15 @@ async def pol_checker(addresses: list):
 
 # Удалить или скрыть после тестов
 async def test_cheker(addresses: list):
-    address = ''
     web3 = Web3(Web3.HTTPProvider(test_link))
     addresses = addresses.split('\n')
     test_result = []
-    for i in range(len(addresses)):
+    for i, address in enumerate(addresses):
         try:
-            address = web3.toChecksumAddress(addresses[i])
+            address = web3.toChecksumAddress(address)
             balance = web3.eth.get_balance(address)
             balance = web3.fromWei(balance, 'ether')
             test_result.append(f"{address}\n{round(balance, 3)} BNB")
-            print('add adds')
         except Exception:
             test_result.append(f"{address} - адрес некорректен")
 
