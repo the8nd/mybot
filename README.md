@@ -33,31 +33,31 @@
 
 <!-- TABLE OF CONTENTS -->
 <details>
-  <summary>Table of Contents</summary>
+  <summary>Содержание</summary>
   <ol>
     <li>
-      <a href="#about-the-project">About The Project</a>
+      <a href="#about-the-project">О проекте</a>
       <ul>
-        <li><a href="#built-with">Built With</a></li>
+        <li><a href="#built-with">Создан с использованием</a></li>
       </ul>
     </li>
     <li>
-      <a href="#getting-started">Getting Started</a>
+      <a href="#getting-started">Начало работы</a>
       <ul>
-        <li><a href="#installation">Installation</a></li>
+        <li><a href="#installation">Установка</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
+    <li><a href="#usage">Использование</a></li>
+    <li><a href="#roadmap">Планы по разработке</a></li>
+    <li><a href="#license">Лицензии</a></li>
+    <li><a href="#contact">Ссылки для связи</a></li>
   </ol>
 </details>
 
 
 
 <!-- ABOUT THE PROJECT -->
-## About The Project
+## Описание
 MyCBot создан для пользователей, которым требуется отправлять криптовалюту и работать с множеством кошельком.
 Поддерживается отправка токенов в 3 режимах:
   - 1 > many;
@@ -65,19 +65,18 @@ MyCBot создан для пользователей, которым требу
   - many > 1;
 
 Так же с помощью бота возможно проверять баланс сразу большого количества кошельков.
-### Built With
+### Создан с использованием
 
 [![Python][Python]][python-url]
   
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
-## Getting Started
+## Подготовка к использованию
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
 
-### Installation
+
+### Установка
 
 1. Для запуска бота понадобятся ноды, которые можно бесплатно взять на Alchemy <a href="https://dashboard.alchemy.com/"> Ссылка </a>
 2. Скачайте репозиторий
@@ -90,10 +89,10 @@ To get a local copy up and running follow these simple example steps.
    token = 'Введите сюда токен';
    ```
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">Вверх</a>)</p>
 
 <!-- USAGE EXAMPLES -->
-## Usage
+## Использование
 После запуска бота, перейдите в телеграмм, далее введите команду /start
 ![image](https://user-images.githubusercontent.com/58310208/194767814-d60aac2f-cc8e-440d-b836-5b58897c3466.png)
 
@@ -107,9 +106,9 @@ To get a local copy up and running follow these simple example steps.
 
 
 <!-- ROADMAP -->
-## Roadmap
+## Планы по разработке
 
-- [ ] Фикс багов
+- [ ] Фикс багов: 1. Невозможность использовать бота сразу несколькими пользователями одновременно
 - [ ] Запуск открытого теста бота
 - [ ] Добавление базы данных
 
@@ -117,14 +116,14 @@ To get a local copy up and running follow these simple example steps.
 
 
 <!-- LICENSE -->
-## License
+## Лицензии
 
 Distributed under the MIT License.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- CONTACT -->
-## Contact
+## Ссылки для связи
 
 [@the89d](https://twitter.com/the89d)
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
