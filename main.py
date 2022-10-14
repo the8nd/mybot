@@ -238,8 +238,8 @@ async def addresses_checker(msg: types.Message, state: FSMContext):
 
     await bot.send_message(msg.from_user.id, 'Проверяю баланс')
     balance_info = asyncio.create_task(checker_choice(data['adds']))
-    balance_info_1 = await balance_info
-    for i, info_msg in enumerate(balance_info_1):
+    balance_info_f = await balance_info
+    for i, info_msg in enumerate(balance_info_f):
         await bot.send_message(msg.from_user.id, info_msg)
     await bot.send_message(msg.from_user.id, 'Все кошельки проверены.', reply_markup=check_keyboard)
     await state.finish()
