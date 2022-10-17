@@ -84,10 +84,7 @@ MyCBot создан для пользователей, которым требу
    git clone https://github.com/the8nd/mybot
    ```
 3. Установите пакеты, которые указаны в requirements.txt
-4. Введите токен от телеграмм бота в файл bot_token.py
-   ```bot_token.py
-   token = 'Введите сюда токен';
-   ```
+4. Создайте файл token.txt в корневой папке и введите в него токен.
 
 <p align="right">(<a href="#readme-top">Вверх</a>)</p>
 
