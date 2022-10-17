@@ -155,10 +155,10 @@ async def sender_gas(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(state=ClientStatesGroup.sender_token_choice)
 async def sender_token_choice(msg: types.Message, state: FSMContext):
-    if msg.text.lower() == 'bnb' or msg.text.lower() == 'usdt' or \
-            msg.text.lower() == 'busd' or msg.text.lower() == 'eth':
-        async with state.proxy() as data:
-            data['token'] = msg.text.lower()
+    async with state.proxy() as data:
+        data['token'] = msg.text.lower()
+    if msg.text.lower() in ['bnb', 'usdt', 'busd'] and data['network'] == 'bsc' \
+            or msg.text.lower() in ['usdt', 'eth'] and data['network'] == 'eth':
         await ClientStatesGroup.sender_address.set()
         await bot.send_message(msg.from_user.id, 'Введите адрес(а) отправителя (1 строка - один адрес)')
     else:
@@ -247,7 +247,7 @@ async def addresses_checker(msg: types.Message, state: FSMContext):
     balance_info = asyncio.create_task(checker_choice(data['adds']))
     balance_info_f = await balance_info
     for i, info_msg in enumerate(balance_info_f):
-        await bot.send_message(msg.from_user.id, info_msg)
+        await bot.send_message(msg.from_user.id, info_msg, parse_mode='HTML')
     await bot.send_message(msg.from_user.id, 'Все кошельки проверены.', reply_markup=check_keyboard)
     await state.finish()
 
