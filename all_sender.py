@@ -3,7 +3,7 @@ from abi_links_contracts import *
 from aiogram.utils.markdown import hlink
 import decimal
 import time
-import datetime
+import logging
 
 
 # В файле располагаются все сендеры, которые бот использует.
@@ -68,9 +68,6 @@ async def token_sender(all_info):
             token_contract = usdt_eth
             token_abi = usdt_eth_abi
             native_token = False
-        else:
-            hash_result.append('Данный токен не поддерживается сетью.')
-            return hash_result
 
     elif all_info['network'] == 'bsc':
         web3 = Web3(Web3.HTTPProvider(bsc_link))  # Подключаемся к bsc_link
@@ -90,10 +87,6 @@ async def token_sender(all_info):
             native_token = False
         elif token_to_send == 'bnb':
             token_name = 'BNB'
-        else:
-            hash_result.append('Данный токен не поддерживается сетью.')
-            return hash_result
-
 
     # Удалить или скрыть после тестов
     elif all_info['network'] == 'test':
@@ -102,7 +95,6 @@ async def token_sender(all_info):
         gwei = 20
         chain_id = 97
         token_name = 'BNB'
-
 
     if native_token == True:
         sender_add = ''
@@ -120,13 +112,18 @@ async def token_sender(all_info):
                 }
                 sign_tx = web3.eth.account.signTransaction(token_tx, sender_private[sender_counter])
                 tx_hash = web3.eth.sendRawTransaction(sign_tx.rawTransaction)
-                #tx_link = hlink('Ссылка', f'https://bscscan.com/tx/{web3.toHex(tx_hash)}') # Потом вернуть на место и сделать для эфира
+                # tx_link = hlink('Ссылка', f'https://bscscan.com/tx/{web3.toHex(tx_hash)}')
+                # Потом вернуть на место и сделать для эфира
+                logging.info(all_info['network'])
+                logging.info(tx_hash)
                 hash_result.append(
-                    f'<b>{counter}</b>\n<b>Хэш:</b> {web3.toHex(tx_hash)}\n<b>Отправлено:</b> {amount_to_send} BNB\n<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
+                    f'<b>{counter}</b>\n<b>Хэш:</b> {web3.toHex(tx_hash)}\n<b>Отправлено:</b> {amount_to_send} BNB\n'
+                    f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
                 time.sleep(time_hold)
             except ValueError:
                 hash_result.append(
-                    f'<b>{counter}</b>\n{sender_add}\nНа кошельке недостаточно средств для оплаты комиссии, либо прошлая транзакция неуспела обработаться. Попытайтесь снова.')
+                    f'<b>{counter}</b>\n{sender_add}\nНа кошельке недостаточно средств для оплаты комиссии,'
+                    f' либо прошлая транзакция неуспела обработаться. Попытайтесь снова.')
             except decimal.InvalidOperation:
                 hash_result.append(f'<b>{counter}</b>\n{sender_add}\nВы ввели текст вместо суммы. Попробуйте еще раз.')
                 return hash_result
@@ -136,7 +133,6 @@ async def token_sender(all_info):
                 sender_counter += 1
             elif bool_reciever == True:
                 reciever_counter += 1
-
 
     elif native_token == False:
         sender_add = ''
@@ -158,11 +154,13 @@ async def token_sender(all_info):
                 tx_hash = web3.eth.sendRawTransaction(sign_tx.rawTransaction)
                 tx_link = hlink('Ссылка', f'https://bscscan.com/tx/{web3.toHex(tx_hash)}')
                 hash_result.append(
-                    f'<b>{counter}</b>\n<b>Хэш:</b> {tx_link}\n<b>Отправлено:</b> {amount_to_send} {token_name} \n<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
+                    f'<b>{counter}</b>\n<b>Хэш:</b> {tx_link}\n<b>Отправлено:</b> {amount_to_send} {token_name} \n'
+                    f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
                 time.sleep(time_hold)
             except ValueError:
                 hash_result.append(
-                    f'<b>{counter}</b>\n{sender_add}\nНа кошельке недостаточно средств для оплаты комиссии, либо прошлая транзакция неуспела обработаться. Попытайтесь снова.')
+                    f'<b>{counter}</b>\n{sender_add}\nНа кошельке недостаточно средств для оплаты комиссии, '
+                    f'либо прошлая транзакция неуспела обработаться. Попытайтесь снова.')
             except decimal.InvalidOperation:
                 hash_result.append(f'<b>{counter}</b>\n{sender_add}\nВы ввели текст вместо суммы. Попробуйте еще раз.')
                 return hash_result
