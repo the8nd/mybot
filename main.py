@@ -158,7 +158,8 @@ async def sender_token_choice(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['token'] = msg.text.lower()
     if msg.text.lower() in ['bnb', 'usdt', 'busd'] and data['network'] == 'bsc' \
-            or msg.text.lower() in ['usdt', 'eth'] and data['network'] == 'eth':
+            or msg.text.lower() in ['usdt', 'eth'] and data['network'] == 'eth' \
+            or msg.text.lower() == 'bnb' and data['network'] == 'test':
         await ClientStatesGroup.sender_address.set()
         await bot.send_message(msg.from_user.id, 'Введите адрес(а) отправителя (1 строка - один адрес)')
     else:
@@ -199,8 +200,18 @@ async def reciever_addresses(msg: types.Message, state: FSMContext):
     await bot.send_message(msg.from_user.id, f'Начал работу. Примерное время ожидания - {delay_time} секунд.')
     sender_info = asyncio.create_task(token_sender(data))
     hashes = await sender_info
-    for i, hash in enumerate(hashes):
-        await bot.send_message(msg.from_user.id, hash, reply_markup=check_keyboard, parse_mode="HTML")
+    b = ''
+    ch = len(hashes)
+    for i, inf in enumerate(hashes):
+        if i % 20 == 0 and i != 0:
+            await bot.send_message(msg.from_user.id, b, parse_mode='HTML')
+            b = ''
+            ch = ch - i
+        elif i % 20 != 0 and ch < 20:
+            b = b + f'{inf}\n{str("<b>─</b>") * 30}\n'
+        else:
+            b = b + f'{inf}\n{str("<b>─</b>") * 30}\n'
+    await bot.send_message(msg.from_user.id, b, reply_markup=check_keyboard, parse_mode='HTML')
     await state.finish()
 
 
@@ -246,9 +257,20 @@ async def addresses_checker(msg: types.Message, state: FSMContext):
     await bot.send_message(msg.from_user.id, 'Проверяю баланс')
     balance_info = asyncio.create_task(checker_choice(data['adds']))
     balance_info_f = await balance_info
-    for i, info_msg in enumerate(balance_info_f):
-        await asyncio.sleep(0.2)
-        await bot.send_message(msg.from_user.id, info_msg, parse_mode='HTML')
+    #for i, info_msg in enumerate(balance_info_f):
+    #    await bot.send_message(msg.from_user.id, info_msg, parse_mode='HTML')
+    b = ''
+    ch = len(balance_info_f)
+    for i, inf in enumerate(balance_info_f):
+        if i % 20 == 0 and i != 0:
+            await bot.send_message(msg.from_user.id, b, parse_mode='HTML' )
+            b = ''
+            ch = ch - i
+        elif i % 20 != 0 and ch < 20:
+            b = b + f'{inf}\n{str("<b>─</b>")*30}\n'
+        else:
+            b = b + f'{inf}\n{str("<b>─</b>")*30}\n'
+    await bot.send_message(msg.from_user.id, b, parse_mode='HTML' )
     await bot.send_message(msg.from_user.id, 'Все кошельки проверены.', reply_markup=check_keyboard)
     await state.finish()
 
