@@ -115,7 +115,7 @@ async def token_sender(all_info):
                 # tx_link = hlink('Ссылка', f'https://bscscan.com/tx/{web3.toHex(tx_hash)}')
                 # Потом вернуть на место и сделать для эфира
                 logging.info(all_info['network'])
-                logging.info(tx_hash)
+                logging.info(web3.toHex(tx_hash))
                 hash_result.append(
                     f'<b>{counter}</b>\n<b>Хэш:</b> {web3.toHex(tx_hash)}\n<b>Отправлено:</b> {amount_to_send} BNB\n'
                     f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
