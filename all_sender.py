@@ -1,3 +1,5 @@
+import asyncio
+
 from web3 import Web3
 from abi_links_contracts import *
 from aiogram.utils.markdown import hlink
@@ -119,7 +121,7 @@ async def token_sender(all_info):
                 hash_result.append(
                     f'<b>{counter}</b> <b>Хэш:</b> {web3.toHex(tx_hash)}\n<b>Отправлено:</b> {amount_to_send} BNB\n'
                     f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
-                time.sleep(time_hold)
+                await asyncio.sleep(time_hold)
             except ValueError:
                 hash_result.append(
                     f'<b>{counter}</b>\n{sender_add}\nНа кошельке недостаточно средств для оплаты комиссии,'
@@ -156,7 +158,7 @@ async def token_sender(all_info):
                 hash_result.append(
                     f'<b>{counter}</b>\n<b>Хэш:</b> {tx_link}\n<b>Отправлено:</b> {amount_to_send} {token_name} \n'
                     f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
-                time.sleep(time_hold)
+                asyncio.sleep(time_hold)
             except ValueError:
                 hash_result.append(
                     f'<b>{counter}</b>\n{sender_add}\nНа кошельке недостаточно средств для оплаты комиссии, '
