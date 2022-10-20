@@ -10,7 +10,7 @@ def read_file(file_name):
 
 # Ссылки на ноды
 arb_link = 'https://arb-mainnet.g.alchemy.com/v2/fwpdYGooLzR3jw8a6YK5HMRbswJWWQmv'  # chain id 42161
-bsc_link = 'https://bsc-dataseed.binance.org/'  # chain id 56
+bsc_link = 'https://bsc-dataseed4.defibit.io'  # chain id 56  https://bsc-dataseed.binance.org/
 polygon_link = 'https://polygon-mainnet.g.alchemy.com/v2/bNT1IhanZMXGDeq1WswvDHS2Vl3kHd4c'  # chain id 137
 ethereum_link = 'https://eth-mainnet.g.alchemy.com/v2/TJ_tNX6LRTX7ZAemte6N7LpbR2zWC4VS'  # chain id 1
 test_link = 'https://data-seed-prebsc-1-s3.binance.org:8545'

@@ -1,3 +1,5 @@
+import asyncio
+
 from web3 import Web3
 from abi_links_contracts import *
 from aiogram.utils.markdown import hlink
@@ -96,7 +98,7 @@ async def token_sender(all_info):
         chain_id = 97
         token_name = 'BNB'
 
-    if native_token == True:
+    if native_token:
         sender_add = ''
         for i in range(o):
             try:
@@ -115,11 +117,11 @@ async def token_sender(all_info):
                 # tx_link = hlink('Ссылка', f'https://bscscan.com/tx/{web3.toHex(tx_hash)}')
                 # Потом вернуть на место и сделать для эфира
                 logging.info(all_info['network'])
-                logging.info(tx_hash)
+                logging.info(web3.toHex(tx_hash))
                 hash_result.append(
-                    f'<b>{counter}</b>\n<b>Хэш:</b> {web3.toHex(tx_hash)}\n<b>Отправлено:</b> {amount_to_send} BNB\n'
+                    f'<b>{counter}</b> <b>Хэш:</b> {web3.toHex(tx_hash)}\n<b>Отправлено:</b> {amount_to_send} BNB\n'
                     f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
-                time.sleep(time_hold)
+                await asyncio.sleep(time_hold)
             except ValueError:
                 hash_result.append(
                     f'<b>{counter}</b>\n{sender_add}\nНа кошельке недостаточно средств для оплаты комиссии,'
@@ -129,12 +131,12 @@ async def token_sender(all_info):
                 return hash_result
 
             counter += 1
-            if bool_sender == True:
+            if bool_sender:
                 sender_counter += 1
-            elif bool_reciever == True:
+            elif bool_reciever:
                 reciever_counter += 1
 
-    elif native_token == False:
+    elif not native_token:
         sender_add = ''
         for i in range(o):
             try:
@@ -156,7 +158,7 @@ async def token_sender(all_info):
                 hash_result.append(
                     f'<b>{counter}</b>\n<b>Хэш:</b> {tx_link}\n<b>Отправлено:</b> {amount_to_send} {token_name} \n'
                     f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
-                time.sleep(time_hold)
+                asyncio.sleep(time_hold)
             except ValueError:
                 hash_result.append(
                     f'<b>{counter}</b>\n{sender_add}\nНа кошельке недостаточно средств для оплаты комиссии, '
@@ -166,9 +168,9 @@ async def token_sender(all_info):
                 return hash_result
 
             counter += 1
-            if bool_sender == True:
+            if bool_sender:
                 sender_counter += 1
-            if bool_reciever == True:
+            if bool_reciever:
                 reciever_counter += 1
 
     hash_result.append('Все отправлено.')
