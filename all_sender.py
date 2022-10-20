@@ -98,7 +98,7 @@ async def token_sender(all_info):
         chain_id = 97
         token_name = 'BNB'
 
-    if native_token == True:
+    if native_token:
         sender_add = ''
         for i in range(o):
             try:
@@ -131,12 +131,12 @@ async def token_sender(all_info):
                 return hash_result
 
             counter += 1
-            if bool_sender == True:
+            if bool_sender:
                 sender_counter += 1
-            elif bool_reciever == True:
+            elif bool_reciever:
                 reciever_counter += 1
 
-    elif native_token == False:
+    elif not native_token:
         sender_add = ''
         for i in range(o):
             try:
@@ -168,9 +168,9 @@ async def token_sender(all_info):
                 return hash_result
 
             counter += 1
-            if bool_sender == True:
+            if bool_sender:
                 sender_counter += 1
-            if bool_reciever == True:
+            if bool_reciever:
                 reciever_counter += 1
 
     hash_result.append('Все отправлено.')
