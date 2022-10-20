@@ -55,7 +55,7 @@ async def msg_sender(msg, send_info):
     for i, inf in enumerate(send_info):
         if i % 10 == 0 and i != 0:
             await bot.send_message(msg.from_user.id, b, parse_mode='HTML')
-            b = ''
+            b = f'{inf}\n{str("<b>─</b>") * 40}\n'
             ch = ch - i
         elif i % 10 != 0 and ch < 10:
             b = b + f'{inf}\n{str("<b>─</b>")*40}\n'
