@@ -237,7 +237,7 @@ async def arb_balance_check(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['network'] = msg.text.lower()
     await ClientStatesGroup.balance_scan.set()
-    await msg.answer('Введите адрес или адреса (1 строка - один адрес)')
+    await msg.answer('Введите адрес или адреса (1 строка - один адрес)', reply_markup=cancel_keyboard)
 
 
 # Заносим адреса в data и уведомляем пользователя о начале работы с его кошельками
