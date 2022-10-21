@@ -4,13 +4,22 @@ from web3 import Web3
 from abi_links_contracts import *
 from aiogram.utils.markdown import hlink
 import decimal
-import time
 import logging
 
 
 # В файле располагаются все сендеры, которые бот использует.
 # Переписать код сендера, чтобы использовать одну и ту же часть для разных сетей. Оптимизировать его.
 # Обработка ошибки не отправленной транзакции.
+
+async def tx_checker(hash, web_link):
+    web3 = Web3(Web3.HTTPProvider(web_link))
+    while True:
+        result_tx = web3.eth.get_transaction(hash)
+        if result_tx['blockHash'] == None:
+            await asyncio.sleep(0.2)
+        else:
+            break
+    return True
 
 
 async def token_sender(all_info):
@@ -29,21 +38,21 @@ async def token_sender(all_info):
     reciever_counter = 0
     bool_sender = True
     bool_reciever = True
+    bool_many = True # Если отправляем many>many или many>1 нет смысла ждать транзу
     native_token = True
 
     # Определяем какой метод рассылки будет использоваться
     # 1 > many
     if len(sender_adds) == 1 and len(sender_private) == 1:
-        time_hold = 10
         bool_sender = False
     # many > many
     elif len(sender_adds) == len(reciever_adds) == len(sender_private):
-        time_hold = 0
+        bool_many = False
 
     # many > 1
     elif len(reciever_adds) == 1 and len(sender_adds) == len(sender_private):
-        time_hold = 0
         bool_reciever = False
+        bool_many = False
     # Если кол-во адресов и приватных ключей не равно друг другу.
     else:
         hash_result.append('Количество адресов или приватных ключей не совпадает. Попытайтесь снова.')
@@ -59,6 +68,7 @@ async def token_sender(all_info):
     if all_info['network'] == 'eth':
         print('ETH test')
         web3 = Web3(Web3.HTTPProvider(ethereum_link))  # Подключаемся к eth_link
+        link = ethereum_link
         gas = all_info['gas']
         gwei = all_info['gwei']
         chain_id = 1
@@ -72,9 +82,10 @@ async def token_sender(all_info):
             native_token = False
 
     elif all_info['network'] == 'bsc':
-        web3 = Web3(Web3.HTTPProvider(bsc_link))  # Подключаемся к bsc_link
-        gas = 75000
-        gwei = 5
+        web3 = Web3(Web3.HTTPProvider(bsc_link))
+        link = bsc_link# Подключаемся к bsc_link
+        gas = all_info['gas']
+        gwei = all_info['gwei']
         chain_id = 56
 
         if token_to_send == 'usdt':
@@ -109,7 +120,7 @@ async def token_sender(all_info):
                     'nonce': nonce,
                     'to': reciever_add,
                     'value': web3.toWei(amount_to_send, 'ether'),
-                    'gas': gas,
+                    'gas': int(gas),
                     'gasPrice': web3.toWei(gwei, 'gwei')
                 }
                 sign_tx = web3.eth.account.signTransaction(token_tx, sender_private[sender_counter])
@@ -121,7 +132,10 @@ async def token_sender(all_info):
                 hash_result.append(
                     f'<b>{counter}</b> <b>Хэш:</b> {web3.toHex(tx_hash)}\n<b>Отправлено:</b> {amount_to_send} BNB\n'
                     f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
-                await asyncio.sleep(time_hold)
+                if bool_many:
+                    tx_hash_result = asyncio.create_task(tx_checker(tx_hash, link))
+                    tx_hash_result_f = await tx_hash_result
+
             except ValueError:
                 hash_result.append(
                     f'<b>{counter}</b>\n{sender_add}\nНа кошельке недостаточно средств для оплаты комиссии,'
@@ -148,7 +162,7 @@ async def token_sender(all_info):
                 token_tx = token_contract_final.functions.transfer(reciever_add, amount_to_send_ether).buildTransaction(
                     {
                         'chainId': chain_id,
-                        'gas': gas,
+                        'gas': int(gas),
                         'gasPrice': web3.toWei(gwei, 'gwei'),
                         'nonce': nonce
                     })
@@ -158,7 +172,9 @@ async def token_sender(all_info):
                 hash_result.append(
                     f'<b>{counter}</b>\n<b>Хэш:</b> {tx_link}\n<b>Отправлено:</b> {amount_to_send} {token_name} \n'
                     f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
-                asyncio.sleep(time_hold)
+                if bool_many:
+                    tx_hash_result = asyncio.create_task(tx_checker(tx_hash, link))
+                    tx_hash_result_f = await tx_hash_result
             except ValueError:
                 hash_result.append(
                     f'<b>{counter}</b>\n{sender_add}\nНа кошельке недостаточно средств для оплаты комиссии, '

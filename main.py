@@ -130,7 +130,8 @@ async def sender_netwok_choice(msg: types.Message, state: FSMContext):
     elif data['network'] == 'bsc':
         await ClientStatesGroup.amount_of_gwei.set()
         gwei = await gwei_price(bsc_link)
-        await bot.send_message(msg.from_user.id, f'Минимальный баланс $ в BNB для отправки транзакции:\n'
+        await bot.send_message(msg.from_user.id, f'<b>Введите количество GWEI</b>\n'
+                                                 'Минимальный баланс $ в BNB для отправки транзакции:\n'
                                                  'Для BNB: 0.03$ (5 GWEI, 21000 GAS)\n'
                                                  'Для BUSD/USDT: 0.08$ (5 GWEI, 75000 GAS)\n'
                                                  f'Текущее значение GWEI - <b><code>{gwei}</code></b>\n',
@@ -152,7 +153,7 @@ async def sender_gwei(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['gwei'] = msg.text.lower()
     await ClientStatesGroup.amount_of_gas.set()
-    await bot.send_message(msg.from_user.id, 'Введите количество газа для транзакции. Лишний газ не сгорит. '
+    await bot.send_message(msg.from_user.id, 'Введите количество газа для транзакции.\nЛишний газ не сгорит.'
                                              'Вводите с запасом. <b>Администрация за фейл транзакции '
                                              'ответственности не несет.</b>', parse_mode='html')
 
