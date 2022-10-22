@@ -35,8 +35,8 @@ class ClientStatesGroup(StatesGroup):
     amount_of_token = State()  # Количество токенов
     reciever_addresses = State()  # Получаем адреса получателей токенов
 
-    amount_of_gwei = State()  # Для сети эфира. Пользователь указывает кол-во gwei
-    amount_of_gas = State()  # Для сети эфира. Пользователь указывает лимит газа
+    amount_of_gwei = State()
+    amount_of_gas = State()
 
 
 # Получаем цену токена с бинанса
