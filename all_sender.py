@@ -19,7 +19,6 @@ async def tx_checker(hash, web_link):
             await asyncio.sleep(0.2)
         else:
             break
-    return True
 
 
 async def token_sender(all_info):
@@ -45,14 +44,13 @@ async def token_sender(all_info):
     # 1 > many
     if len(sender_adds) == 1 and len(sender_private) == 1:
         bool_sender = False
-    # many > many
-    elif len(sender_adds) == len(reciever_adds) == len(sender_private):
         bool_many = False
-
+    # many > many проверяем, что кол-во везде равно.
+    elif len(sender_adds) == len(reciever_adds) == len(sender_private):
+        pass
     # many > 1
     elif len(reciever_adds) == 1 and len(sender_adds) == len(sender_private):
         bool_reciever = False
-        bool_many = False
     # Если кол-во адресов и приватных ключей не равно друг другу.
     else:
         hash_result.append('Количество адресов или приватных ключей не совпадает. Попытайтесь снова.')
@@ -132,7 +130,7 @@ async def token_sender(all_info):
                 hash_result.append(
                     f'<b>{counter}</b> <b>Хэш:</b> {web3.toHex(tx_hash)}\n<b>Отправлено:</b> {amount_to_send} BNB\n'
                     f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
-                if bool_many:
+                if not bool_many:
                     tx_hash_result = asyncio.create_task(tx_checker(tx_hash, link))
                     tx_hash_result_f = await tx_hash_result
 
@@ -172,7 +170,7 @@ async def token_sender(all_info):
                 hash_result.append(
                     f'<b>{counter}</b>\n<b>Хэш:</b> {tx_link}\n<b>Отправлено:</b> {amount_to_send} {token_name} \n'
                     f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
-                if bool_many:
+                if not bool_many:
                     tx_hash_result = asyncio.create_task(tx_checker(tx_hash, link))
                     tx_hash_result_f = await tx_hash_result
             except ValueError:
