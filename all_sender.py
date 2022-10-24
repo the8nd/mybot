@@ -130,6 +130,7 @@ async def token_sender(all_info):
                 hash_result.append(
                     f'<b>{counter}</b> <b>Хэш:</b> {web3.toHex(tx_hash)}\n<b>Отправлено:</b> {amount_to_send} BNB\n'
                     f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
+                await asyncio.sleep(0.5)
                 if not bool_many:
                     tx_hash_result = asyncio.create_task(tx_checker(tx_hash, link))
                     tx_hash_result_f = await tx_hash_result
@@ -170,6 +171,7 @@ async def token_sender(all_info):
                 hash_result.append(
                     f'<b>{counter}</b>\n<b>Хэш:</b> {tx_link}\n<b>Отправлено:</b> {amount_to_send} {token_name} \n'
                     f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
+                await asyncio.sleep(0.5)
                 if not bool_many:
                     tx_hash_result = asyncio.create_task(tx_checker(tx_hash, link))
                     tx_hash_result_f = await tx_hash_result

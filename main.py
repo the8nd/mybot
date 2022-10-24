@@ -80,7 +80,7 @@ async def wait_time(info):
     if len(sender_adds) == len(reciever_adds):
         delay_time = 20
     elif len(sender_adds) == 1:
-        delay_time = len(reciever_adds) * 70
+        delay_time = len(reciever_adds) * 5
     elif len(reciever_adds) == 1:
         delay_time = 20
 
