@@ -1,6 +1,8 @@
 import asyncio
 
 from web3 import Web3
+from web3.exceptions import TransactionNotFound
+
 from abi_links_contracts import *
 from aiogram.utils.markdown import hlink
 import decimal
@@ -14,12 +16,14 @@ import logging
 async def tx_checker(hash, web_link):
     web3 = Web3(Web3.HTTPProvider(web_link))
     while True:
-        result_tx = web3.eth.get_transaction(hash)
-        if result_tx['blockHash'] == None:
-            await asyncio.sleep(0.2)
-        else:
-            break
-
+        try:
+            result_tx = web3.eth.get_transaction(hash)
+            if result_tx['blockHash'] == None:
+                await asyncio.sleep(0.2)
+            else:
+                break
+        except TransactionNotFound:
+            pass
 
 async def token_sender(all_info):
     # Создание всех нужных переменных
@@ -101,6 +105,7 @@ async def token_sender(all_info):
 
     # Удалить или скрыть после тестов
     elif all_info['network'] == 'test':
+        link = test_link
         web3 = Web3(Web3.HTTPProvider(test_link))
         gas = 100000
         gwei = 20
@@ -111,8 +116,8 @@ async def token_sender(all_info):
         sender_add = ''
         for i in range(o):
             try:
-                sender_add = web3.toChecksumAddress(sender_adds[sender_counter])  # Превращаем в checksum
-                reciever_add = web3.toChecksumAddress(reciever_adds[reciever_counter])
+                sender_add = web3.toChecksumAddress((sender_adds[sender_counter]).strip())  # Превращаем в checksum
+                reciever_add = web3.toChecksumAddress((reciever_adds[reciever_counter]).strip())
                 nonce = web3.eth.getTransactionCount(sender_add)
                 token_tx = {
                     'nonce': nonce,
@@ -121,7 +126,7 @@ async def token_sender(all_info):
                     'gas': int(gas),
                     'gasPrice': web3.toWei(gwei, 'gwei')
                 }
-                sign_tx = web3.eth.account.signTransaction(token_tx, sender_private[sender_counter])
+                sign_tx = web3.eth.account.signTransaction(token_tx, (sender_private[sender_counter]).strip())
                 tx_hash = web3.eth.sendRawTransaction(sign_tx.rawTransaction)
                 # tx_link = hlink('Ссылка', f'https://bscscan.com/tx/{web3.toHex(tx_hash)}')
                 # Потом вернуть на место и сделать для эфира
@@ -130,7 +135,6 @@ async def token_sender(all_info):
                 hash_result.append(
                     f'<b>{counter}</b> <b>Хэш:</b> {web3.toHex(tx_hash)}\n<b>Отправлено:</b> {amount_to_send} BNB\n'
                     f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
-                await asyncio.sleep(0.5)
                 if not bool_many:
                     tx_hash_result = asyncio.create_task(tx_checker(tx_hash, link))
                     tx_hash_result_f = await tx_hash_result
@@ -153,8 +157,8 @@ async def token_sender(all_info):
         sender_add = ''
         for i in range(o):
             try:
-                sender_add = web3.toChecksumAddress(sender_adds[sender_counter])
-                reciever_add = web3.toChecksumAddress(reciever_adds[reciever_counter])
+                sender_add = web3.toChecksumAddress((sender_adds[sender_counter]).strip())
+                reciever_add = web3.toChecksumAddress((reciever_adds[reciever_counter]).strip())
                 nonce = web3.eth.getTransactionCount(sender_add)
                 amount_to_send_ether = web3.toWei(amount_to_send, 'ether')
                 token_contract_final = web3.eth.contract(address=token_contract, abi=token_abi)
@@ -165,13 +169,12 @@ async def token_sender(all_info):
                         'gasPrice': web3.toWei(gwei, 'gwei'),
                         'nonce': nonce
                     })
-                sign_tx = web3.eth.account.signTransaction(token_tx, sender_private[sender_counter])
+                sign_tx = web3.eth.account.signTransaction(token_tx, (sender_private[sender_counter]).strip())
                 tx_hash = web3.eth.sendRawTransaction(sign_tx.rawTransaction)
                 tx_link = hlink('Ссылка', f'https://bscscan.com/tx/{web3.toHex(tx_hash)}')
                 hash_result.append(
                     f'<b>{counter}</b>\n<b>Хэш:</b> {tx_link}\n<b>Отправлено:</b> {amount_to_send} {token_name} \n'
                     f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
-                await asyncio.sleep(0.5)
                 if not bool_many:
                     tx_hash_result = asyncio.create_task(tx_checker(tx_hash, link))
                     tx_hash_result_f = await tx_hash_result
