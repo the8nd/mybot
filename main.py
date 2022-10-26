@@ -269,13 +269,5 @@ async def addresses_checker(msg: types.Message, state: FSMContext):
     await bot.send_message(msg.from_user.id, 'Все кошельки проверены.', reply_markup=check_keyboard)
     await state.finish()
 
-
-# Пока не реализованная функция. Нужно сделать красивое оформление и if для свапа валют местами, если кидает ошибку.
-@dp.message_handler()
-async def price_checker(msg: types.message):
-    pass
-    # await bot.send_message(msg.from_user.id, 'Временно отсутствует')
-
-
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
