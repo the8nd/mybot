@@ -4,15 +4,8 @@ from main import get_price
 from abi_links_contracts import *
 
 
-#async def checker(info):
+# async def checker(info):
 #    web3 = Web3(Web3.AsyncHTTPProvider)
-
-
-
-
-
-
-
 
 
 # Функция отвечающая за проверку баланса в сети арбитрума

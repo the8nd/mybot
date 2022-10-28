@@ -36,7 +36,6 @@ async def token_sender(all_info):
     reciever_adds = all_info['reciever']
     reciever_adds = reciever_adds.split('\n')
     hash_result = []
-    counter = 1
     sender_counter = 0
     reciever_counter = 0
     bool_sender = True
@@ -131,9 +130,12 @@ async def token_sender(all_info):
                 # tx_link = hlink('Ссылка', f'https://bscscan.com/tx/{web3.toHex(tx_hash)}')
                 # Потом вернуть на место и сделать для эфира
                 logging.info(all_info['network'])
-                logging.info(web3.toHex(tx_hash))
+                logging.info(f'Sender: {sender_add}')
+                logging.info(f'Reciever: {reciever_add}')
+                logging.info(f'Hash: {web3.toHex(tx_hash)}')
+                logging.info('-'*20)
                 hash_result.append(
-                    f'<b>{counter}</b> <b>Хэш:</b> {web3.toHex(tx_hash)}\n<b>Отправлено:</b> {amount_to_send} BNB\n'
+                    f'<b>{i+1}</b> <b>Хэш:</b> {web3.toHex(tx_hash)}\n<b>Отправлено:</b> {amount_to_send} BNB\n'
                     f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
                 if not bool_many:
                     tx_hash_result = asyncio.create_task(tx_checker(tx_hash, link))
@@ -141,13 +143,12 @@ async def token_sender(all_info):
 
             except ValueError:
                 hash_result.append(
-                    f'<b>{counter}</b>\n{sender_add}\nНа кошельке недостаточно средств для оплаты комиссии,'
+                    f'<b>{i+1}</b>\n{sender_add}\nНа кошельке недостаточно средств для оплаты комиссии,'
                     f' либо прошлая транзакция неуспела обработаться. Попытайтесь снова.')
             except decimal.InvalidOperation:
-                hash_result.append(f'<b>{counter}</b>\n{sender_add}\nВы ввели текст вместо суммы. Попробуйте еще раз.')
+                hash_result.append(f'<b>{i+1}</b>\n{sender_add}\nВы ввели текст вместо суммы. Попробуйте еще раз.')
                 return hash_result
 
-            counter += 1
             if bool_sender:
                 sender_counter += 1
             elif bool_reciever:
@@ -172,21 +173,25 @@ async def token_sender(all_info):
                 sign_tx = web3.eth.account.signTransaction(token_tx, (sender_private[sender_counter]).strip())
                 tx_hash = web3.eth.sendRawTransaction(sign_tx.rawTransaction)
                 tx_link = hlink('Ссылка', f'https://bscscan.com/tx/{web3.toHex(tx_hash)}')
+                logging.info(all_info['network'])
+                logging.info(f'Sender: {sender_add}')
+                logging.info(f'Reciever: {reciever_add}')
+                logging.info(f'Hash: {web3.toHex(tx_hash)}')
+                logging.info('-'*20)
                 hash_result.append(
-                    f'<b>{counter}</b>\n<b>Хэш:</b> {tx_link}\n<b>Отправлено:</b> {amount_to_send} {token_name} \n'
+                    f'<b>{i+1}</b>\n<b>Хэш:</b> {tx_link}\n<b>Отправлено:</b> {amount_to_send} {token_name} \n'
                     f'<b>Отправитель:</b> {sender_add}\n<b>Получатель:</b> {reciever_add}')
                 if not bool_many:
                     tx_hash_result = asyncio.create_task(tx_checker(tx_hash, link))
                     tx_hash_result_f = await tx_hash_result
             except ValueError:
                 hash_result.append(
-                    f'<b>{counter}</b>\n{sender_add}\nНа кошельке недостаточно средств для оплаты комиссии, '
+                    f'<b>{i+1}</b>\n{sender_add}\nНа кошельке недостаточно средств для оплаты комиссии, '
                     f'либо прошлая транзакция неуспела обработаться. Попытайтесь снова.')
             except decimal.InvalidOperation:
-                hash_result.append(f'<b>{counter}</b>\n{sender_add}\nВы ввели текст вместо суммы. Попробуйте еще раз.')
+                hash_result.append(f'<b>{i+1}</b>\n{sender_add}\nВы ввели текст вместо суммы. Попробуйте еще раз.')
                 return hash_result
 
-            counter += 1
             if bool_sender:
                 sender_counter += 1
             if bool_reciever:

@@ -205,8 +205,13 @@ async def amount_of_token(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         amount = msg.text
         data['amount'] = amount.replace(',', '.')
-    await ClientStatesGroup.reciever_addresses.set()
-    await bot.send_message(msg.from_user.id, 'Введите адрес(а) получателя (1 строка - один адрес)')
+    try:
+        float(data['amount'])
+        await ClientStatesGroup.reciever_addresses.set()
+        await bot.send_message(msg.from_user.id, 'Введите адрес(а) получателя (1 строка - один адрес)')
+    except ValueError:
+        await bot.send_message(msg.from_user.id, 'Вы ввели буквы вместо числа. Попытайтесь еще раз.')
+        await ClientStatesGroup.amount_of_token.set()
 
 
 @dp.message_handler(state=ClientStatesGroup.reciever_addresses)
