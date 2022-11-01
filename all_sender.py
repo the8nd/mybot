@@ -149,10 +149,24 @@ async def token_sender(all_info):
                     tx_hash_result_f = await tx_hash_result
 
             except ValueError:
+                logging.info(all_info['username'])
+                logging.info(all_info['id'])
+                logging.info(all_info['network'])
+                logging.info(f'Sender: {sender_add}')
+                logging.info(f'Reciever: {reciever_add}')
+                logging.info('ValueError')
+                logging.info('-'*20)
                 hash_result.append(
                     f'<b>{i+1}</b>\n{sender_add}\nНа кошельке недостаточно средств для оплаты комиссии,'
                     f' либо прошлая транзакция неуспела обработаться. Попытайтесь снова.')
             except decimal.InvalidOperation:
+                logging.info(all_info['username'])
+                logging.info(all_info['id'])
+                logging.info(all_info['network'])
+                logging.info(f'Sender: {sender_add}')
+                logging.info(f'Reciever: {reciever_add}')
+                logging.info('decimal error')
+                logging.info('-'*20)
                 hash_result.append(f'<b>{i+1}</b>\n{sender_add}\nВы ввели текст вместо суммы. Попробуйте еще раз.')
                 return hash_result
 
@@ -180,6 +194,8 @@ async def token_sender(all_info):
                 sign_tx = web3.eth.account.signTransaction(token_tx, (sender_private[sender_counter]).strip())
                 tx_hash = web3.eth.sendRawTransaction(sign_tx.rawTransaction)
                 tx_link = hlink('Ссылка', f'https://bscscan.com/tx/{web3.toHex(tx_hash)}')
+                logging.info(all_info['username'])
+                logging.info(all_info['id'])
                 logging.info(all_info['network'])
                 logging.info(f'Sender: {sender_add}')
                 logging.info(f'Reciever: {reciever_add}')
@@ -192,10 +208,24 @@ async def token_sender(all_info):
                     tx_hash_result = asyncio.create_task(tx_checker(tx_hash, link))
                     tx_hash_result_f = await tx_hash_result
             except ValueError:
+                logging.info(all_info['username'])
+                logging.info(all_info['id'])
+                logging.info(all_info['network'])
+                logging.info(f'Sender: {sender_add}')
+                logging.info(f'Reciever: {reciever_add}')
+                logging.info('ValueError')
+                logging.info('-'*20)
                 hash_result.append(
                     f'<b>{i+1}</b>\n{sender_add}\nНа кошельке недостаточно средств для оплаты комиссии, '
                     f'либо прошлая транзакция неуспела обработаться. Попытайтесь снова.')
             except decimal.InvalidOperation:
+                logging.info(all_info['username'])
+                logging.info(all_info['id'])
+                logging.info(all_info['network'])
+                logging.info(f'Sender: {sender_add}')
+                logging.info(f'Reciever: {reciever_add}')
+                logging.info('decimal error')
+                logging.info('-'*20)
                 hash_result.append(f'<b>{i+1}</b>\n{sender_add}\nВы ввели текст вместо суммы. Попробуйте еще раз.')
                 return hash_result
 
