@@ -1,4 +1,3 @@
-import logging
 
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
@@ -14,6 +13,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 import asyncio
+import logging
 
 
 storage = MemoryStorage()
@@ -92,9 +92,7 @@ async def wait_time(info):
 async def start_command(msg: types.Message):
     await msg.reply(f"Выберите следующее действие:\n"
                     f"1. Проверить баланс кошелька\n"
-                    f"2. Узнать текущую стоимость валюты\n "
-                    f"(Данные о курсах берутся с Binance)\n"
-                    f"3. Отправить токен", reply_markup=check_keyboard)
+                    f"2. Отправить токен", reply_markup=check_keyboard)
 
 
 # Сбрасывает машину состояний. Возможен выход из любого состояния.
@@ -113,7 +111,8 @@ async def sender_start(msg: types.message):
     await ClientStatesGroup.sender_network_choice.set()
     logging.info(msg.from_user.username)
     logging.info(msg.from_user.id)
-    await msg.answer('Выберите сеть: BSC, ETH',
+    await msg.answer('Выберите сеть: BSC, ETH'
+                     '\n(Не более 90 адресов за раз)',
                      reply_markup=sender_keyboard)
 
 
@@ -153,8 +152,12 @@ async def sender_gwei(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['gwei'] = msg.text.lower()
     await ClientStatesGroup.amount_of_gas.set()
-    await bot.send_message(msg.from_user.id, 'Введите количество газа для транзакции.\nЛишний газ не сгорит.'
-                                             'Вводите с запасом. <b>Администрация за фейл транзакции '
+    await bot.send_message(msg.from_user.id, 'Введите количество газа для транзакции.'
+                                             '\nМинимальный баланс $ в BNB для отправки транзакции:\n'
+                                             'Для BNB: 0.03$ (5 GWEI, 21000 GAS)\n'
+                                             'Для BUSD/USDT: 0.08$ (5 GWEI, 75000 GAS)\nЛишний газ не сгорит. '
+                                             'Вводите с запасом.\n'
+                                             '<b>Администрация за фейл транзакции '
                                              'ответственности не несет.</b>', parse_mode='html')
 
 
@@ -202,11 +205,10 @@ async def sender_private(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(state=ClientStatesGroup.amount_of_token)
 async def amount_of_token(msg: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        amount = msg.text
-        data['amount'] = amount.replace(',', '.')
     try:
-        float(data['amount'])
+        async with state.proxy() as data:
+            amount = msg.text
+            data['amount'] = float(amount.replace(',', '.'))
         await ClientStatesGroup.reciever_addresses.set()
         await bot.send_message(msg.from_user.id, 'Введите адрес(а) получателя (1 строка - один адрес)')
     except ValueError:
@@ -251,6 +253,8 @@ async def arb_balance_check(msg: types.Message, state: FSMContext):
 async def addresses_checker(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['adds'] = msg.text
+        data['id'] = msg.from_user.id
+        data['username'] = msg.from_user.username
 
     if data['network'] == 'arb':
         checker_choice = arb_checker
@@ -265,7 +269,6 @@ async def addresses_checker(msg: types.Message, state: FSMContext):
     else:
         await msg.answer('Допущена ошибка при вводе. Попробуйте ввести сеть еще раз.')
         await ClientStatesGroup.network_scan.set()
-
     await bot.send_message(msg.from_user.id, 'Проверяю баланс')
     balance_info = asyncio.create_task(checker_choice(data['adds']))
     balance_info_f = await balance_info

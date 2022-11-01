@@ -14,19 +14,24 @@ import logging
 # Обработка ошибки не отправленной транзакции.
 
 async def tx_checker(hash, web_link):
+    counter = 0
     web3 = Web3(Web3.HTTPProvider(web_link))
     while True:
         try:
             result_tx = web3.eth.get_transaction(hash)
-            if result_tx['blockHash'] == None:
+            if result_tx['blockHash'] is None:
                 await asyncio.sleep(0.2)
             else:
                 break
         except TransactionNotFound:
-            pass
+            counter += 1
+            if counter == 20:
+                break
+
 
 async def token_sender(all_info):
     # Создание всех нужных переменных
+    logging.info(all_info)
     token_to_send = all_info['token']
     sender_adds = all_info['sender_adds']
     sender_adds = sender_adds.split('\n')
@@ -67,7 +72,6 @@ async def token_sender(all_info):
 
     # Выбираем нужную сеть, нужный контракт и нужную часть кода.
     if all_info['network'] == 'eth':
-        print('ETH test')
         web3 = Web3(Web3.HTTPProvider(ethereum_link))  # Подключаемся к eth_link
         link = ethereum_link
         gas = all_info['gas']
@@ -129,6 +133,8 @@ async def token_sender(all_info):
                 tx_hash = web3.eth.sendRawTransaction(sign_tx.rawTransaction)
                 # tx_link = hlink('Ссылка', f'https://bscscan.com/tx/{web3.toHex(tx_hash)}')
                 # Потом вернуть на место и сделать для эфира
+                logging.info(all_info['username'])
+                logging.info(all_info['id'])
                 logging.info(all_info['network'])
                 logging.info(f'Sender: {sender_add}')
                 logging.info(f'Reciever: {reciever_add}')
