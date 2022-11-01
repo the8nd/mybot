@@ -152,10 +152,7 @@ async def sender_gwei(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['gwei'] = msg.text.lower()
     await ClientStatesGroup.amount_of_gas.set()
-    await bot.send_message(msg.from_user.id, 'Введите количество газа для транзакции.'
-                                             '\nМинимальный баланс $ в BNB для отправки транзакции:\n'
-                                             'Для BNB: 0.03$ (5 GWEI, 21000 GAS)\n'
-                                             'Для BUSD/USDT: 0.08$ (5 GWEI, 75000 GAS)\nЛишний газ не сгорит. '
+    await bot.send_message(msg.from_user.id, 'Введите количество газа для транзакции. Лишний газ не сгорит. '
                                              'Вводите с запасом.\n'
                                              '<b>Администрация за фейл транзакции '
                                              'ответственности не несет.</b>', parse_mode='html')
@@ -220,6 +217,8 @@ async def amount_of_token(msg: types.Message, state: FSMContext):
 async def reciever_addresses(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['reciever'] = msg.text
+        data['id'] = msg.from_user.id
+        data['username'] = msg.from_user.username
     delay_time = await wait_time(data)
     await bot.send_message(msg.from_user.id, f'Начал работу. Примерное время ожидания - {delay_time} секунд.')
     sender_info = asyncio.create_task(token_sender(data))
@@ -245,7 +244,7 @@ async def arb_balance_check(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['network'] = msg.text.lower()
     await ClientStatesGroup.balance_scan.set()
-    await msg.answer('Введите адрес или адреса (1 строка - один адрес)', reply_markup=cancel_keyboard)
+    await msg.answer('Введите адрес или адреса (1 строка - один)', reply_markup=cancel_keyboard)
 
 
 # Заносим адреса в data и уведомляем пользователя о начале работы с его кошельками
@@ -253,8 +252,6 @@ async def arb_balance_check(msg: types.Message, state: FSMContext):
 async def addresses_checker(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['adds'] = msg.text
-        data['id'] = msg.from_user.id
-        data['username'] = msg.from_user.username
 
     if data['network'] == 'arb':
         checker_choice = arb_checker

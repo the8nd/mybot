@@ -117,6 +117,7 @@ async def token_sender(all_info):
 
     if native_token:
         sender_add = ''
+        logging.info('-'*20)
         for i in range(o):
             try:
                 sender_add = web3.toChecksumAddress((sender_adds[sender_counter]).strip())  # Превращаем в checksum
