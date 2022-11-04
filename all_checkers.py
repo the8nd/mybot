@@ -13,7 +13,7 @@ async def arb_checker(addresses: list):
     arb_result = []
     for i, address in enumerate(addresses):
         try:
-            address = web3.toChecksumAddress(address)
+            address = web3.toChecksumAddress(address.strip())
             balance = web3.eth.get_balance(address)
             balance = web3.fromWei(balance, 'ether')
             balance_arb_usdt = contract_usdt_arb.functions.balanceOf(address).call()
@@ -40,7 +40,7 @@ async def bsc_checker(addresses: list):
     bsc_result = []
     for i, address in enumerate(addresses):
         try:
-            address = web3.toChecksumAddress(address)
+            address = web3.toChecksumAddress(address.strip())
             balance = web3.eth.get_balance(address)
             balance = web3.fromWei(balance, 'ether')
             balance_busd = contract_busd.functions.balanceOf(address).call()
@@ -72,7 +72,7 @@ async def eth_checker(addresses: list):
     eth_result = []
     for i, address in enumerate(addresses):
         try:
-            address = web3.toChecksumAddress(address)
+            address = web3.toChecksumAddress(address.strip())
             balance = web3.eth.get_balance(address)
             balance = web3.fromWei(balance, 'ether')
             balance_usdt = contract_usdt.functions.balanceOf(address).call()
@@ -95,7 +95,7 @@ async def pol_checker(addresses: list):
     pol_result = []
     for i, address in enumerate(addresses):
         try:
-            address = web3.toChecksumAddress(address)
+            address = web3.toChecksumAddress(address.strip())
             balance = web3.eth.get_balance(address)
             balance = web3.fromWei(balance, 'ether')
             balance_weth = contract_weth.functions.balanceOf(address).call()
@@ -116,7 +116,7 @@ async def test_checker(addresses: list):
     test_result = []
     for i, address in enumerate(addresses):
         try:
-            address = web3.toChecksumAddress(address)
+            address = web3.toChecksumAddress(address.strip())
             balance = web3.eth.get_balance(address)
             balance = web3.fromWei(balance, 'ether')
             test_result.append(f"<b>{address}</b>\n{round(balance, 3)} BNB")

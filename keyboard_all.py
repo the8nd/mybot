@@ -1,8 +1,8 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 # Начальная клавиатура.
-button_balance_check, button_currency_check, button_token_sender = KeyboardButton('Баланс'), KeyboardButton('Узнать курс'), KeyboardButton('Отправить токен')
+button_balance_check, button_token_sender = KeyboardButton('Баланс'), KeyboardButton('Отправить токен')
 check_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-check_keyboard.add(button_balance_check, button_currency_check, button_token_sender)
+check_keyboard.add(button_balance_check, button_token_sender)
 
 
 #Клавиатура чекера балансов и сендера

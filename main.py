@@ -1,4 +1,3 @@
-import logging
 
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
@@ -14,6 +13,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 import asyncio
+import logging
 
 
 storage = MemoryStorage()
@@ -35,8 +35,8 @@ class ClientStatesGroup(StatesGroup):
     amount_of_token = State()  # Количество токенов
     reciever_addresses = State()  # Получаем адреса получателей токенов
 
-    amount_of_gwei = State()  # Для сети эфира. Пользователь указывает кол-во gwei
-    amount_of_gas = State()  # Для сети эфира. Пользователь указывает лимит газа
+    amount_of_gwei = State()
+    amount_of_gas = State()
 
 
 # Получаем цену токена с бинанса
@@ -55,12 +55,12 @@ async def msg_sender(msg, send_info):
     for i, inf in enumerate(send_info):
         if i % 10 == 0 and i != 0:
             await bot.send_message(msg.from_user.id, b, parse_mode='HTML')
-            b = f'{inf}\n{str("<b>─</b>") * 40}\n'
+            b = f'{inf}\n{str("<b>─</b>") * 25}\n'
             ch = ch - i
         elif i % 10 != 0 and ch < 10:
-            b = b + f'{inf}\n{str("<b>─</b>")*40}\n'
+            b = b + f'{inf}\n{str("<b>─</b>")*25}\n'
         else:
-            b = b + f'{inf}\n{str("<b>─</b>")*40}\n'
+            b = b + f'{inf}\n{str("<b>─</b>")*25}\n'
     await bot.send_message(msg.from_user.id, b, reply_markup=check_keyboard, parse_mode='HTML')
     return True
 
@@ -80,7 +80,7 @@ async def wait_time(info):
     if len(sender_adds) == len(reciever_adds):
         delay_time = 20
     elif len(sender_adds) == 1:
-        delay_time = len(reciever_adds) * 10
+        delay_time = len(reciever_adds) * 5
     elif len(reciever_adds) == 1:
         delay_time = 20
 
@@ -92,9 +92,7 @@ async def wait_time(info):
 async def start_command(msg: types.Message):
     await msg.reply(f"Выберите следующее действие:\n"
                     f"1. Проверить баланс кошелька\n"
-                    f"2. Узнать текущую стоимость валюты\n "
-                    f"(Данные о курсах берутся с Binance)\n"
-                    f"3. Отправить токен", reply_markup=check_keyboard)
+                    f"2. Отправить токен", reply_markup=check_keyboard)
 
 
 # Сбрасывает машину состояний. Возможен выход из любого состояния.
@@ -113,7 +111,8 @@ async def sender_start(msg: types.message):
     await ClientStatesGroup.sender_network_choice.set()
     logging.info(msg.from_user.username)
     logging.info(msg.from_user.id)
-    await msg.answer('Выберите сеть: BSC, ETH',
+    await msg.answer('Выберите сеть: BSC, ETH'
+                     '\n(Не более 90 адресов за раз)',
                      reply_markup=sender_keyboard)
 
 
@@ -130,7 +129,8 @@ async def sender_netwok_choice(msg: types.Message, state: FSMContext):
     elif data['network'] == 'bsc':
         await ClientStatesGroup.amount_of_gwei.set()
         gwei = await gwei_price(bsc_link)
-        await bot.send_message(msg.from_user.id, f'Минимальный баланс $ в BNB для отправки транзакции:\n'
+        await bot.send_message(msg.from_user.id, f'<b>Введите количество GWEI</b>\n'
+                                                 'Минимальный баланс $ в BNB для отправки транзакции:\n'
                                                  'Для BNB: 0.03$ (5 GWEI, 21000 GAS)\n'
                                                  'Для BUSD/USDT: 0.08$ (5 GWEI, 75000 GAS)\n'
                                                  f'Текущее значение GWEI - <b><code>{gwei}</code></b>\n',
@@ -153,7 +153,8 @@ async def sender_gwei(msg: types.Message, state: FSMContext):
         data['gwei'] = msg.text.lower()
     await ClientStatesGroup.amount_of_gas.set()
     await bot.send_message(msg.from_user.id, 'Введите количество газа для транзакции. Лишний газ не сгорит. '
-                                             'Вводите с запасом. <b>Администрация за фейл транзакции '
+                                             'Вводите с запасом.\n'
+                                             '<b>Администрация за фейл транзакции '
                                              'ответственности не несет.</b>', parse_mode='html')
 
 
@@ -201,17 +202,23 @@ async def sender_private(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(state=ClientStatesGroup.amount_of_token)
 async def amount_of_token(msg: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        amount = msg.text
-        data['amount'] = amount.replace(',', '.')
-    await ClientStatesGroup.reciever_addresses.set()
-    await bot.send_message(msg.from_user.id, 'Введите адрес(а) получателя (1 строка - один адрес)')
+    try:
+        async with state.proxy() as data:
+            amount = msg.text
+            data['amount'] = float(amount.replace(',', '.'))
+        await ClientStatesGroup.reciever_addresses.set()
+        await bot.send_message(msg.from_user.id, 'Введите адрес(а) получателя (1 строка - один адрес)')
+    except ValueError:
+        await bot.send_message(msg.from_user.id, 'Вы ввели буквы вместо числа. Попытайтесь еще раз.')
+        await ClientStatesGroup.amount_of_token.set()
 
 
 @dp.message_handler(state=ClientStatesGroup.reciever_addresses)
 async def reciever_addresses(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['reciever'] = msg.text
+        data['id'] = msg.from_user.id
+        data['username'] = msg.from_user.username
     delay_time = await wait_time(data)
     await bot.send_message(msg.from_user.id, f'Начал работу. Примерное время ожидания - {delay_time} секунд.')
     sender_info = asyncio.create_task(token_sender(data))
@@ -237,7 +244,7 @@ async def arb_balance_check(msg: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['network'] = msg.text.lower()
     await ClientStatesGroup.balance_scan.set()
-    await msg.answer('Введите адрес или адреса (1 строка - один адрес)')
+    await msg.answer('Введите адрес или адреса (1 строка - один)', reply_markup=cancel_keyboard)
 
 
 # Заносим адреса в data и уведомляем пользователя о начале работы с его кошельками
@@ -259,22 +266,13 @@ async def addresses_checker(msg: types.Message, state: FSMContext):
     else:
         await msg.answer('Допущена ошибка при вводе. Попробуйте ввести сеть еще раз.')
         await ClientStatesGroup.network_scan.set()
-
     await bot.send_message(msg.from_user.id, 'Проверяю баланс')
     balance_info = asyncio.create_task(checker_choice(data['adds']))
     balance_info_f = await balance_info
-    msg_for_send = asyncio.create_task(msg_sender(msg ,balance_info_f))
+    msg_for_send = asyncio.create_task(msg_sender(msg, balance_info_f))
     msg_for_send_f = await msg_for_send
     await bot.send_message(msg.from_user.id, 'Все кошельки проверены.', reply_markup=check_keyboard)
     await state.finish()
-
-
-# Пока не реализованная функция. Нужно сделать красивое оформление и if для свапа валют местами, если кидает ошибку.
-@dp.message_handler()
-async def price_checker(msg: types.message):
-    pass
-    # await bot.send_message(msg.from_user.id, 'Временно отсутствует')
-
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
