@@ -172,7 +172,7 @@ async def token_sender(all_info):
 
             if bool_sender:
                 sender_counter += 1
-            elif bool_reciever:
+            if bool_reciever:
                 reciever_counter += 1
 
     elif not native_token:
