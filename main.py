@@ -1,20 +1,18 @@
-
+import json
+import asyncio
+import logging
+import aiohttp
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
-from bot_token import token
-from all_sender import *
-from all_checkers import *
-from keyboard_all import *
-import aiohttp
-import json
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
-import asyncio
-import logging
-
+from bot_token import token
+from all_sender import token_sender
+from all_checkers import *
+from keyboard_all import *
 
 storage = MemoryStorage()
 bot = Bot(token=token)
@@ -50,18 +48,18 @@ async def get_price(currency1: str, currency2: str):
 
 
 async def msg_sender(msg, send_info):
-    b = ''
-    ch = len(send_info)
+    msg_all = ''
+    msg_len = len(send_info)
     for i, inf in enumerate(send_info):
         if i % 10 == 0 and i != 0:
-            await bot.send_message(msg.from_user.id, b, parse_mode='HTML')
-            b = f'{inf}\n{str("<b>─</b>") * 25}\n'
-            ch = ch - i
-        elif i % 10 != 0 and ch < 10:
-            b = b + f'{inf}\n{str("<b>─</b>")*25}\n'
+            await bot.send_message(msg.from_user.id, msg_all, parse_mode='HTML')
+            msg_all = f'{inf}\n{str("<b>─</b>") * 25}\n'
+            msg_len = msg_len - i
+        elif i % 10 != 0 and msg_len < 10:
+            msg_all = msg_all + f'{inf}\n{str("<b>─</b>")*25}\n'
         else:
-            b = b + f'{inf}\n{str("<b>─</b>")*25}\n'
-    await bot.send_message(msg.from_user.id, b, reply_markup=check_keyboard, parse_mode='HTML')
+            msg_all = msg_all + f'{inf}\n{str("<b>─</b>")*25}\n'
+    await bot.send_message(msg.from_user.id, msg_all, reply_markup=check_keyboard, parse_mode='HTML')
     return True
 
 
@@ -90,9 +88,9 @@ async def wait_time(info):
 # Команда старт. Выдает пользователю инструкции. Бот может начинать работу и не с нее.
 @dp.message_handler(commands=['start'])
 async def start_command(msg: types.Message):
-    await msg.reply(f"Выберите следующее действие:\n"
-                    f"1. Проверить баланс кошелька\n"
-                    f"2. Отправить токен", reply_markup=check_keyboard)
+    await msg.reply("Выберите следующее действие:\n"
+                    "1. Проверить баланс кошелька\n"
+                    "2. Отправить токен", reply_markup=check_keyboard)
 
 
 # Сбрасывает машину состояний. Возможен выход из любого состояния.
@@ -123,7 +121,8 @@ async def sender_netwok_choice(msg: types.Message, state: FSMContext):
     if data['network'] == 'eth':
         await ClientStatesGroup.amount_of_gwei.set()
         gwei = await gwei_price(ethereum_link)
-        await bot.send_message(msg.from_user.id, f'Введите кол-во GWEI.\nТекущее кол-во GWEI в сети: '
+        await bot.send_message(msg.from_user.id, f'Введите кол-во GWEI.\n'
+                                                 f'Текущее кол-во GWEI в сети: '
                                                  f'<b><code>{gwei}</code></b>',
                                parse_mode='HTML', reply_markup=cancel_keyboard)
     elif data['network'] == 'bsc':
@@ -223,7 +222,7 @@ async def reciever_addresses(msg: types.Message, state: FSMContext):
     await bot.send_message(msg.from_user.id, f'Начал работу. Примерное время ожидания - {delay_time} секунд.')
     sender_info = asyncio.create_task(token_sender(data))
     hashes = await sender_info
-    msg_for_send = asyncio.create_task(msg_sender(msg ,hashes))
+    msg_for_send = asyncio.create_task(msg_sender(msg, hashes))
     msg_for_send_f = await msg_for_send
     await state.finish()
 

@@ -1,24 +1,21 @@
 import asyncio
-
-from web3 import Web3
-from web3.exceptions import TransactionNotFound
-
-from abi_links_contracts import *
-from aiogram.utils.markdown import hlink
 import decimal
 import logging
-
+from web3 import Web3
+from web3.exceptions import TransactionNotFound
+from aiogram.utils.markdown import hlink
+from abi_links_contracts import *
 
 # В файле располагаются все сендеры, которые бот использует.
 # Переписать код сендера, чтобы использовать одну и ту же часть для разных сетей. Оптимизировать его.
 # Обработка ошибки не отправленной транзакции.
 
-async def tx_checker(hash, web_link):
+async def tx_checker(hash_i, web_link):
     counter = 0
     web3 = Web3(Web3.HTTPProvider(web_link))
     while True:
         try:
-            result_tx = web3.eth.get_transaction(hash)
+            result_tx = web3.eth.get_transaction(hash_i)
             if result_tx['blockHash'] is None:
                 await asyncio.sleep(0.2)
             else:
@@ -66,9 +63,9 @@ async def token_sender(all_info):
 
     # Ищем самый длинный массив, чтобы использовать его для цикла
     if len(sender_adds) >= len(reciever_adds):
-        o = len(sender_adds)
+        max_len = len(sender_adds)
     else:
-        o = len(reciever_adds)
+        max_len = len(reciever_adds)
 
     # Выбираем нужную сеть, нужный контракт и нужную часть кода.
     if all_info['network'] == 'eth':
@@ -118,7 +115,7 @@ async def token_sender(all_info):
     if native_token:
         sender_add = ''
         logging.info('-'*20)
-        for i in range(o):
+        for i in range(max_len):
             try:
                 sender_add = web3.toChecksumAddress((sender_adds[sender_counter]).strip())  # Превращаем в checksum
                 reciever_add = web3.toChecksumAddress((reciever_adds[reciever_counter]).strip())
@@ -177,7 +174,7 @@ async def token_sender(all_info):
 
     elif not native_token:
         sender_add = ''
-        for i in range(o):
+        for i in range(max_len):
             try:
                 sender_add = web3.toChecksumAddress((sender_adds[sender_counter]).strip())
                 reciever_add = web3.toChecksumAddress((reciever_adds[reciever_counter]).strip())

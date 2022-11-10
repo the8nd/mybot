@@ -1,4 +1,3 @@
-import web3
 from web3 import Web3
 from main import get_price
 from abi_links_contracts import *
@@ -19,8 +18,8 @@ async def arb_checker(addresses: list):
             balance_arb_usdt = contract_usdt_arb.functions.balanceOf(address).call()
             balance_arb_usdt = web3.fromWei(balance_arb_usdt, 'ether')
             balance_eth_in_busd = float(balance) * float(price_dollar['price'])
-            arb_result.append(f"<b>{address}</b>\n{'%.3f' % balance} ETH ~ {'%.2f' % balance_eth_in_busd}$\n"
-                              f"{'%2.f' % balance_arb_usdt} USDT")
+            arb_result.append(f"<b>{address}</b>\n{round(balance, 3)} ETH ~ {round(balance_eth_in_busd, 2)}$\n"
+                              f"{round(balance_arb_usdt, 2)} USDT")
         except Exception:
             arb_result.append(f"<b>{address}</b> - адрес некорректен")
     return arb_result
@@ -54,10 +53,14 @@ async def bsc_checker(addresses: list):
             balance_bnb_in_busd = float(balance) * float(price_dollar_bnb['price'])
             balance_twt_in_busd = float(balance_twt) * float(price_dollar_twt['price'])
             balance_cake_in_busd = float(balance_cake) * float(price_dollar_cake['price'])
-            bsc_result.append(f"<b>{address}</b>\n{'%.3f' % balance} BNB ~ {'%.2f' % balance_bnb_in_busd}$\n"
-                              f"{'%2.f' % balance_busd} BUSD\n{balance_usdt} USDT\n{'%2.f' % balance_twt} TWT ~ "
-                              f"{'%.2f' % balance_twt_in_busd}\n{'%2.f' % balance_cake} Cake ~ "
-                              f"{'%.2f' % balance_cake_in_busd}")
+            bsc_result.append(f"<b>{address}</b>\n{round(balance, 3)} BNB ~ "
+                              f"{round(balance_bnb_in_busd, 2)}$\n"
+                              f"{round(balance_busd, 2)} BUSD\n"
+                              f"{balance_usdt} USDT\n"
+                              f"{round(balance_twt, 2)} TWT ~ "
+                              f"{round(balance_twt_in_busd, 2)}\n"
+                              f"{round(balance_cake, 2)} Cake ~ "
+                              f"{round(balance_cake_in_busd, 2)}")
         except Exception:
             bsc_result.append(f"<b>{address}</b> - адрес некорректен")
 
@@ -78,7 +81,8 @@ async def eth_checker(addresses: list):
             balance_usdt = contract_usdt.functions.balanceOf(address).call()
             balance_usdt = web3.fromWei(balance_usdt, 'ether')
             balance_eth_in_usdt = float(balance) * float(price_dollar_eth['price'])
-            eth_result.append(f"<b>{address}</b>\n{round(balance, 3)} ETH ~ {round(balance_eth_in_usdt, 2)}$"
+            eth_result.append(f"<b>{address}</b>\n{round(balance, 3)} "
+                              f"ETH ~ {round(balance_eth_in_usdt, 2)}$"
                               f"\n{round(balance_usdt, 2)} USDT")
 
         except Exception:

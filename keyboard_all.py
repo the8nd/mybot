@@ -6,7 +6,9 @@ check_keyboard.add(button_balance_check, button_token_sender)
 
 
 #Клавиатура чекера балансов и сендера
-button_balance_bsc, button_balance_arb, button_balance_eth, button_balance_pol, button_cancel = KeyboardButton('BSC'), KeyboardButton('ARB'), KeyboardButton('ETH'),KeyboardButton('POL'), KeyboardButton('/cancel')
+button_balance_bsc, button_balance_arb = KeyboardButton('BSC'), KeyboardButton('ARB')
+button_balance_eth, button_balance_pol = KeyboardButton('ETH'),KeyboardButton('POL')
+button_cancel = KeyboardButton('/cancel')
 button_balance_test = KeyboardButton('test') # Удалить или скрыть после тестов
 balance_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 balance_keyboard.add(button_balance_bsc, button_balance_arb)
